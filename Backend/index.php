@@ -13,13 +13,15 @@ if ($request == '') {
     $request = '/';
 }
 
-//array of routes - a mapping between routes and controller name and method!
-//remove routes from here!! 
 $apis = $routes;
 
 if (isset($apis[$request])) {
     $controller_name = $apis[$request]['controllers']; 
     $method = $apis[$request]['method'];
+    if($controller_name == 'AiAnalyze.php') {
+        require_once "Ai/{$controller_name}";
+            exit;
+    }
     require_once "controllers/{$controller_name}.php";
     
     $controller = new $controller_name();

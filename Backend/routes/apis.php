@@ -8,4 +8,5 @@ $routes = [
     '/AiReviews/create' => ['controllers' => 'AiRevController', 'method' => 'createAiReview'],
     '/AiReviews/update' => ['controllers' => 'AiRevController', 'method' => 'updateAiReview'],
     '/AiReviews/delete' => ['controllers' => 'AiRevController', 'method' => 'deleteAiReview'],
+    '/AiAnalyze' => ['controllers' => 'AiAnalyze.php', 'method' => 'analyze'],
 ];
