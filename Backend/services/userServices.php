@@ -48,6 +48,8 @@ class UserService
                 ];
             }
         }
+        $hashed_password = password_hash($data["password"], PASSWORD_DEFAULT);
+        $data["password"] = $hashed_password;
 
         $userId = User::create($this->connection, $data);
         if($userId == 1062){
