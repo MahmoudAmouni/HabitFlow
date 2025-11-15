@@ -143,7 +143,6 @@
       background-color: white;
   }
 
- /* Responsive adjustments for footer */
  @media (max-width: 768px) {
      .footer-container {
          gap: 1rem;

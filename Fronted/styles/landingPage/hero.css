@@ -162,7 +162,6 @@
      transform: scale(1.1);
  }
 
- /* Modal Overlay */
  .modal-overlay {
      display: none;
      position: fixed;
@@ -171,7 +170,6 @@
      width: 100%;
      height: 100%;
      background-color: rgba(15, 12, 26, 0.8);
-     /* Match your primary background with opacity */
      backdrop-filter: blur(4px);
      z-index: 1000;
      align-items: center;
@@ -183,7 +181,6 @@
      display: flex;
  }
 
- /* Modal Card */
  .modal-card {
      background-color: var(--card-bg);
      border-radius: 1rem;
@@ -227,18 +224,15 @@
      justify-content: center;
  }
 
- /* Reuse existing button styles */
  .modal-buttons .btn {
      flex: 1;
      max-width: 200px;
  }
 
- /* Prevent scrolling when modal is open */
  body.modal-open {
      overflow: hidden;
  }
 
- /* Responsive adjustments */
  @media (max-width: 1400px) {
      .container {
          margin: 0 50px;
