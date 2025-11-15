@@ -1,11 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HabbitFlow</title>
+    <link rel="stylesheet" href="Fronted/styles/global.css" />
+    <link rel="stylesheet" href="Fronted/styles/landingPage/hero.css" />
+    <link rel="stylesheet" href="Fronted/styles/landingPage/features.css" />
+    <link rel="stylesheet" href="Fronted/styles/landingPage/about.css" />
+    <link rel="stylesheet" href="Fronted/styles/landingPage/footer.css" />
+    <title>Habit Flow</title>
 </head>
+
 <body>
-    Hello World!
+    <nav class="navbar">
+        <div class="logo-container">
+            <div class="logo"></div>
+            <span class="logo-text">Habit Flow</span>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-primary">Start Now</button>
+            <button class="btn btn-secondary">Login</button>
+        </div>
+    </nav>
+
+    <div class="bg-animation">
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+        <div id="stars4"></div>
+    </div>
+
+    <div class="container">
+        <main class="hero">
+            <div class="hero-logo"></div>
+            <h1 class="hero-title">Habit Flow</h1>
+            <p class="hero-subtitle">Build better habits, one day at a time.</p>
+
+            <div class="feature-card">
+                <textarea class="text-area" type="text"
+                    placeholder="Track your daily habits and watch your progress grow..."></textarea>
+                <div class="scroll-button">
+                    <span class="scroll-icon">↑</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-card">
+            <h2 class="modal-title">Sign Up</h2>
+            <p class="modal-subtitle">Join Habit Flow today and start tracking your habits.</p>
+
+            <div class="modal-buttons">
+                <button class="btn btn-primary">Sign Up</button>
+                <button id="close-modal" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Add this section after the feature-card div in the hero section -->
+    <div class="features-section">
+        <h2 class="features-title">Your habits, your data, your progress.</h2>
+        <p class="features-subtitle">Sign up free and start tracking in 30 seconds.</p>
+
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">➕</div>
+                <h3>Track any habit</h3>
+                <p>Type it once, check it daily takes 5 seconds.</p>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">🔥</div>
+                <h3>Build streaks</h3>
+                <p>Keep the chain alive; miss a day, start again.</p>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">📊</div>
+                <h3>See patterns</h3>
+                <p>Weekly & monthly stats show your strong and weak days.</p>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">🏆</div>
+                <h3>Achieve goals</h3>
+                <p>Reach new personal records every week.</p>
+            </div>
+        </div>
+    </div>
+    <!-- Add this section after the features-section -->
+    <div class="about-section">
+        <h2 class="about-title">About us</h2>
+
+        <div class="about-card">
+            <h3>About Habit Flow</h3>
+            <p>We believe tracking your health should feel like texting a friend, not filling a form. Habit Flow lets
+                you
+                dump any thought "walked 25 min, 2 coffees, slept at 01:30" and our AI turns it into clean data: steps,
+                caffeine, sleep hours, mood, you name it. No menus, no calorie databases, just type and go.</p>
+
+            <h3>Why we built it</h3>
+            <p>Most apps drown you in buttons and guilt. We wanted something forgiving: a single box that listens,
+                learns,
+                and only nudges when it spots a pattern that matters to you. Whether you're chasing deeper sleep, lower
+                caffeine, or just want proof you're moving more, Habit Flow keeps the focus on progress, not perfection
+            </p>
+        </div>
+    </div>
+    <!-- Add this at the very bottom of your body, after all other content -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo-section">
+                <div class="footer-logo">
+                    <div class="logo"></div>
+                    <span class="logo-text">Habit Flow</span>
+                </div>
+                <p class="footer-tagline">One line a day, lasting change.</p>
+            </div>
+            <div class="footer-middle">
+                <div class="footer-links">
+                    <a href="#about">About</a>
+                    <span class="separator">|</span>
+                    <a href="#insights">Insights</a>
+                    <span class="separator">|</span>
+                    <a href="#pricing">Pricing</a>
+                    <span class="separator">|</span>
+                    <a href="#help">Help</a>
+                </div>
+                <div class="footer-copyright">
+                    <p>© 2025 Habit Flow – all rights reserved.</p>
+                </div>
+
+            </div>
+
+            <div class="footer-social">
+                <div class="footer-social-title">
+                    <h2>Social Links</h2>
+                </div>
+                <div class="footer-social-links">
+                    <a href="#" class="social-icon"><img src="Fronted/assets/images/facebook.svg" width="26" height="26" /></a>
+                    <a href="#" class="social-icon"><img src="Fronted/assets/images/instagram.svg" width="26" height="26" /></a>
+                    <a href="#" class="social-icon"><img src="Fronted/assets/images/tiktok.svg" width="21" height="32" /></a>
+                    <a href="#" class="social-icon"><img src="Fronted/assets/images/snapchat.svg" width="26" height="26" /></a>
+                </div>
+            </div>
+
+
+        </div>
+    </footer>
+    <script src="Fronted/scripts/landingPage/script.js"></script>
 </body>
+
 </html>
