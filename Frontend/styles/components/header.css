@@ -1,0 +1,43 @@
+.header {
+    background-color: var(--secondary-bg);
+    padding: 1rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.header-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+}
+
+.header-link:hover {
+    color: var(--text-white);
+}
+
+.logout-btn {
+    background-color: var(--accent-green);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background-color: #00c26d;
+    transform: translateY(-1px);
+}

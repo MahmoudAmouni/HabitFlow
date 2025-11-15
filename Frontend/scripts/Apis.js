@@ -44,7 +44,7 @@ export async function getUserByEmail(email, password) {
       }
     );
     const data = await res.json()
-    console.log(data)
+    return data.data
   } catch (error) {
     console.log(error);
   }
