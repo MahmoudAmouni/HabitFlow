@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/global.css" />
+    <link rel="stylesheet" href="../styles/components/header.css" />
+    <link rel="stylesheet" href="../styles/components/sideBar.css" />
+    <link rel="stylesheet" href="../styles/pages/logs.css" />
+    <title>Logs</title>
+</head>
+<body>
+    <!-- siderbar -->
+    <aside class="sidebar" id="side-bar"></aside>
+    
+    <main class="main-content">
+        <!-- header -->
+        <header class="header" id="header"></header>
+    
+        <div class="page-content">
+            <h2 class="page-title">Add Logs</h2>
+    
+            <div class="add-log-form">
+                <div class="form-row">
+                    <label class="form-label">Select Habit</label>
+                    <select id="habit-select" class="form-select">
+                    </select>
+                </div>
+    
+                <div class="form-row">
+                    <label class="form-label">Select Date</label>
+                    <select id="date-select" class="form-select">
+                    </select>
+                </div>
+    
+                <div class="form-row">
+                    <div class="log-entry-container">
+                        <label class="form-label">Log Entry</label>
+                        <input type="text" id="log-input" class="form-input" placeholder="e.g. Running 3kms">
+                        <div class="unit-box">km</div>
+                    </div>
+                </div>
+    
+                <button id="add-log-btn" class="btn btn-primary">Add Log</button>
+            </div>
+    
+            <hr class="divider">
+    
+            <div class="logs-container" id="logs-container">
+            </div>
+        </div>
+    </main>
+    <script src="../scripts/components/header.js"></script>
+    <script src="../scripts/components/sideBar.js"></script>
+    <script src="../scripts/logs.js"></script>
+</body>
+</html>
