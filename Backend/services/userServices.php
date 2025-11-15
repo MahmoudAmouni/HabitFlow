@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . "/../models/User.php");
+require_once( __DIR__ . "/../models/User.php");
 
 class UserService
 {
@@ -27,7 +27,7 @@ class UserService
         }
         return ['status' => 200, 'data' => $data];
     }
-    public function getUserByEmail($email,$password)
+    public function getUserByEmail($email, $password)
     {
         if ($email && $password) {
             $user = User::getUserByEmail($this->connection, $email, $password);
@@ -40,7 +40,7 @@ class UserService
 
     public function createuser(array $data): array
     {
-        $requiredFields = ['name', 'email', 'password','height','weight','gender'];
+        $requiredFields = ['name', 'email', 'password', 'height', 'weight', 'gender'];
         foreach ($requiredFields as $field) {
             if (!isset($data[$field]) || empty(trim($data[$field]))) {
                 return [
@@ -53,14 +53,14 @@ class UserService
         $data["password"] = $hashed_password;
 
         $userId = User::create($this->connection, $data);
-        if ($userId== 1062){
+        if ($userId == 1062) {
             return [
                 'status' => 500,
                 'data' => [
                     'message' => 'Duplicate Email'
                 ]
             ];
-        } 
+        }
         if ($userId) {
             return [
                 'status' => 201,

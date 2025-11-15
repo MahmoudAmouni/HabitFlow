@@ -116,31 +116,34 @@ class User extends Model
         return $this;
     }
 
-    public static function  getUserByEmail(mysqli $connection,$email,$password){
-        $sql ="SELECT * from users WHERE email = ?";
+    public static function getUserByEmail(mysqli $connection, $email, $password)
+    {
+        $sql = "SELECT * from users WHERE email = ?";
         $query = $connection->prepare($sql);
-        $query->bind_param("s",$email);
+        $query->bind_param("s", $email);
         $query->execute();
 
         $user = $query->get_result()->fetch_assoc();
-        if(!$user)return false;
-        if(!password_verify($password,$user["password"]))return false;
+        if (!$user)
+            return false;
+        if (!password_verify($password, $user["password"]))
+            return false;
         unset($user["password"]);
         return $user;
-        
+
     }
 
 
-    
+
 
     public function __toString()
     {
-        return $this->id . " | " . $this->name . " | " . $this->email . " | " . $this->gender . " | " .$this->height . " | " .$this->weight;
+        return $this->id . " | " . $this->name . " | " . $this->email . " | " . $this->gender . " | " . $this->height . " | " . $this->weight;
     }
 
     public function toArray()
     {
-        return ["id" => $this->id, "name" => $this->name, "email" => $this->email, "password" => $this->password, "weight" => $this->weight, "height" => $this->height, "gender" => $this->gender , "role" => $this->role];
+        return ["id" => $this->id, "name" => $this->name, "email" => $this->email, "password" => $this->password, "weight" => $this->weight, "height" => $this->height, "gender" => $this->gender, "role" => $this->role];
     }
 
 }

@@ -24,7 +24,8 @@ abstract class Model
 
         call_user_func_array(array($query, "bind_param"), array_merge(array($types), $params));
         $query->execute();
-        if($connection->errno == 1062)return 1062;
+        if ($connection->errno == 1062)
+            return 1062;
         return $connection->insert_id;
 
     }
@@ -78,11 +79,11 @@ abstract class Model
             static::$table,
             static::$primary_key
         );
-        
+
         $query = $connection->prepare($sql);
         $query->bind_param("i", $id);
         $query->execute();
-        
+
         $data = $query->get_result()->fetch_assoc();
 
         return $data ? new static($data) : null;
@@ -115,7 +116,7 @@ abstract class Model
         return $types;
     }
 
-    
+
 
     //use past tense for commits
     //add backend -> or frontend -> 
