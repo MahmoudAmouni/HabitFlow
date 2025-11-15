@@ -35,14 +35,9 @@
      gap: 0.5rem;
  }
 
- .logo {
-     width: 60px;
-     height: 60px;
-     background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-     mask: url("../../assets/images/logo.png") no-repeat center;
-     -webkit-mask: url("../../assets/images/logo.png") no-repeat center;
-     mask-size: contain;
-     -webkit-mask-size: contain;
+ .logo img{
+     width: 45px;
+     height: 35px;
      padding-bottom: -1rem;
  }
 
@@ -90,14 +85,9 @@
      text-align: center;
  }
 
- .hero-logo {
-     width: 180px;
-     height: 180px;
-     background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-     mask: url("../../images/assets/logo.png") no-repeat center;
-     -webkit-mask: url("../../assets/images/logo.png") no-repeat center;
-     mask-size: contain;
-     -webkit-mask-size: contain;
+ .hero-logo img{
+     width: 140px;
+     height: 120px;
  }
 
  .hero-title {
