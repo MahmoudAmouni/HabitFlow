@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../styles/global.css" rel="stylesheet" />
+    <link href="../styles/components/sideBar.css" rel="stylesheet" />
+    <link href="../styles/components/header.css" rel="stylesheet" />
+    <link href="../styles/pages/home.css" rel="stylesheet" />
+    <title>Habit Flow Dashboard</title>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="side-bar"></aside>
+
+    <main class="main-content">
+        <!-- header -->
+        <header class="header" id="header"></header>
+
+        <div class="chat-container-wrapper">
+            <div class="chat-container" id="chat-container"></div>
+        </div>
+
+
+        <div class="input-area">
+            <textarea class="input-field" id="user-input"
+                placeholder="Type your habit or thought... (e.g. 'walked 25 min, 2 coffees, slept at 01:30')" rows="1"
+                autocomplete="off"></textarea>
+            <button class="send-btn" id="send-btn">
+                <span class="send-icon">↑</span>
+            </button>
+        </div>
+
+    </main>
+    <script src="../scripts/Authentication/checkuser.js"></script>
+    <script src="../scripts/components/sideBar.js"></script>
+    <script src="../scripts/components/header.js"></script>
+    <script src="../scripts/chat.js"></script>
+</body>
+
+</html>
