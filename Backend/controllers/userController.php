@@ -21,6 +21,12 @@ class UserController
         $result = $this->userService->getUsers($id);
         echo ResponseService::response($result['status'], $result['data']);
     }
+    public function getUserByEmail()
+    {
+        $input = json_decode(file_get_contents("php://input"), true);
+        $result = $this->userService->getUserByEmail( $input["email"],$input["password"]);
+        echo ResponseService::response($result['status'], $result['data']);
+    }
 
     public function deleteUser()
     {

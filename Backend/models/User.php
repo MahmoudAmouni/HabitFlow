@@ -116,6 +116,20 @@ class User extends Model
         return $this;
     }
 
+    public static function  getUserByEmail(mysqli $connection,$email,$password){
+        $sql ="SELECT * from users WHERE email = ? AND password = ?";
+
+        echo $email;
+        echo $password;
+        $query = $connection->prepare($sql);
+        $query->bind_param("ss",$email, $password);
+        $query->execute();
+
+        $data = $query->get_result()->fetch_assoc();
+
+        return $data ?: null;
+    }
+
 
     
 

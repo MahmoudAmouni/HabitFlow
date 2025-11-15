@@ -27,6 +27,16 @@ class UserService
         }
         return ['status' => 200, 'data' => $data];
     }
+    public function getUserByEmail($email,$password)
+    {
+        if ($email && $password) {
+            $user = User::getUserByEmail($this->connection, $email, $password);
+            if ($user) {
+                return ['status' => 200, 'data' => $user];
+            }
+            return ['status' => 404, 'data' => ['error' => 'user not found']];
+        }
+    }
 
     public function createuser(array $data): array
     {
