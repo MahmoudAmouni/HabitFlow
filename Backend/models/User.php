@@ -117,17 +117,17 @@ class User extends Model
     }
 
     public static function  getUserByEmail(mysqli $connection,$email,$password){
-        $sql ="SELECT * from users WHERE email = ? AND password = ?";
-
-        echo $email;
-        echo $password;
+        $sql ="SELECT * from users WHERE email = ?";
         $query = $connection->prepare($sql);
-        $query->bind_param("ss",$email, $password);
+        $query->bind_param("s",$email);
         $query->execute();
 
-        $data = $query->get_result()->fetch_assoc();
-
-        return $data ?: null;
+        $user = $query->get_result()->fetch_assoc();
+        if(!$user)return false;
+        if(!password_verify($password,$user["password"]))return false;
+        unset($user["password"]);
+        return $user;
+        
     }
 
 

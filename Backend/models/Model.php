@@ -24,6 +24,7 @@ abstract class Model
 
         call_user_func_array(array($query, "bind_param"), array_merge(array($types), $params));
         $query->execute();
+        if($connection->errno == 1062)return 1062;
         return $connection->insert_id;
 
     }
