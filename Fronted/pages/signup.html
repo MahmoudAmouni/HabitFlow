@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Habit Flow</title>
+    <link rel="stylesheet" href="../styles/global.css">
+    <link rel="stylesheet" href="../styles/landingPage/hero.css">
+    <link rel="stylesheet" href="../styles/signUp-login/signup.css">
+</head>
+
+<body>
+    <div class="signup-container">
+        <div class="signup-card">
+            <div class="signup-logo">
+                <div class="logo"></div>
+                <span class="logo-text">Habit Flow</span>
+            </div>
+            <h1 class="signup-title">Sign Up</h1>
+            <p class="signup-subtitle">Create your account to start tracking habits today.</p>
+
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" class="form-input" placeholder="Enter your username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <label for="height" class="form-label">Height</label>
+                        <input type="number" id="height" class="form-input" placeholder="e.g. 175" required>
+                    </div>
+                    <div class="form-col">
+                        <label for="weight" class="form-label">Weight</label>
+                        <input type="number" id="weight" class="form-input" placeholder="e.g. 70" required>
+                    </div>
+                </div>
+
+                <div class="radio-group">
+                    <label class="form-label">Gender</label>
+                    <label class="radio-label">
+                        <input type="radio" name="gender" value="male" class="radio-input" required>
+                        Male
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="gender" value="female" class="radio-input">
+                        Female
+                    </label>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+
+            <div class="login-link">
+                Already have an account? <a href="login.html">Log In</a>
+            </div>
+        </div>
+    </div>
+    <div class="bg-animation">
+        <div id="stars"></div>
+        <div id="stars2"></div>
+        <div id="stars3"></div>
+        <div id="stars4"></div>
+    </div>
+</body>
+
+</html>
