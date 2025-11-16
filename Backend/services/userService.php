@@ -107,25 +107,5 @@ class UserService
         return ['status' => 500, 'data' => ['error' => 'Failed to delete user']];
     }
 
-
-
-    public function validateuserData(array $data, bool $isUpdate = false): array
-    {
-        $errors = [];
-        $fields = ['name', 'email', 'password', 'height', 'weight', 'gender'];
-
-        foreach ($fields as $field) {
-            if (!$isUpdate) {
-                if (!isset($data[$field]) || empty(trim($data[$field]))) {
-                    $errors[] = ucfirst($field) . ' is required';
-                }
-            } else {
-                if (isset($data[$field]) && empty(trim($data[$field]))) {
-                    $errors[] = ucfirst($field) . ' cannot be empty';
-                }
-            }
-        }
-        return $errors;
-    }
 }
 ?>
