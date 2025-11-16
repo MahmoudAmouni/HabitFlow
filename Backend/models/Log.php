@@ -1,9 +1,9 @@
 <?php
-include("Model.php");
-
+require_once __DIR__ . '/Model.php';
 class Log extends Model
 {
     private int $id;
+    private int $user_id;
     private int $habit_id;
     private string $value;
     private string $logged_at;
@@ -13,6 +13,7 @@ class Log extends Model
     public function __construct(array $data)
     {
         $this->id = $data["id"];
+        $this->user_id = $data["user_id"];
         $this->habit_id = $data["habit_id"];
         $this->value = $data["value"];
         $this->logged_at = $data["logged_at"];
@@ -51,7 +52,7 @@ class Log extends Model
 
 
 
-    public function setUser_id(string $user_id): self
+    public function setUser_id(int $user_id): self
     {
         $this->user_id = $user_id;
         return $this;
@@ -69,7 +70,6 @@ class Log extends Model
         return $this;
     }
 
-
     public function __toString()
     {
         return $this->id . " | " . $this->habit_id . " | "  . $this->logged_at ." | " . $this->value;
@@ -77,7 +77,7 @@ class Log extends Model
 
     public function toArray()
     {
-        return ["id" => $this->id, "habit_id" => $this->habit_id, "value" => $this->value, "logged_at" => $this->logged_at];
+        return ["id" => $this->id,"user_id" => $this->user_id,"habit_id" => $this->habit_id, "value" => $this->value, "logged_at" => $this->logged_at];
     }
 
 }

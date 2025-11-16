@@ -17,8 +17,20 @@ class HabitController
 
     public function getHabits()
     {
-        $id = $id = isset($_GET["id"]) ? $_GET["id"] : null;
-        $result = $this->habitService->getHabits($id);
+        $input = json_decode(file_get_contents("php://input"), true);
+        $id = $input["id"] ?? null;
+        if ($id) {
+            $result = $this->habitService->getHabitById($id);
+            echo ResponseService::response($result['status'], $result['data']);
+            exit;
+        }
+        $user_id = $input["user_id"] ?? null;
+        if ($user_id) {
+            $result = $this->habitService->getHabitsByUserId($user_id);
+            echo ResponseService::response($result['status'], $result['data']);
+            exit;
+        }
+        $result = $this->habitService->getAllHabits();
         echo ResponseService::response($result['status'], $result['data']);
     }
 
@@ -52,7 +64,8 @@ class HabitController
     public function updateHabit()
     {
         $input = json_decode(file_get_contents("php://input"), true);
-        $id = $input["id"];
+        $id = $input["id"]??null;
+        
 
         if (!$id) {
             echo ResponseService::response(400, ['error' => 'ID is required']);

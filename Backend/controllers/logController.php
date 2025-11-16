@@ -17,8 +17,27 @@ class LogController
 
     public function getLogs()
     {
-        $id = $id = isset($_GET["id"]) ? $_GET["id"] : null;
-        $result = $this->logService->getLogs($id);
+        $input = json_decode(file_get_contents("php://input"), true);
+        $id = $input["id"]?? null;
+        if($id){
+            $result = $this->logService->getLogById($id);
+            echo ResponseService::response($result['status'], $result['data']);
+            exit;
+        }
+        $user_id = $input["user_id"] ?? null;
+        $habit_id = $input["habit_id"] ?? null;
+        if ($user_id) {
+            $result = $this->logService->getLogsByOtherId($user_id,"user_id");
+            echo ResponseService::response($result['status'], $result['data']);
+            exit;
+        }
+        if ($habit_id) {
+            $result = $this->logService->getLogsByOtherId($habit_id, "habit_id");
+            echo ResponseService::response($result['status'], $result['data']);
+            exit;
+        }
+        
+        $result = $this->logService->getAllLogs();
         echo ResponseService::response($result['status'], $result['data']);
     }
 

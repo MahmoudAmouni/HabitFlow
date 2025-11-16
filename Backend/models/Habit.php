@@ -1,6 +1,5 @@
 <?php
-include("Model.php");
-
+require_once __DIR__ . '/Model.php';
 class Habit extends Model
 {
     private int $id;

@@ -52,7 +52,7 @@ class UserService
         $data["password"] = $hashed_password;
 
         $userId = User::create($this->connection, $data);
-        if($userId == 1062){
+        if($userId == "Duplicate"){
             return [
                 'status' => 500,
                 'data' => [
@@ -75,31 +75,33 @@ class UserService
 
     public function updateuser(int $id, array $data)
     {
-        $user = User::find($this->connection, $id);
-        if (!$user) {
-            return ['status' => 404, 'data' => ['error' => 'user not found']];
-        }
+        //if no user return
+        $user = User::find($this->connection, $id,"id");
+        if (!$user) return ['status' => 404, 'data' => ['error' => 'user not found']];
+        
+        //if no data return
+        if (empty($data)) return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
+        
 
-        if (empty($data)) {
-            return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
-        }
-
-        $result = User::update($this->connection, $id, $data);
-        if ($result) {
-            return ['status' => 200, 'data' => ['message' => 'user updated successfully']];
-        }
+        //duplicate email return
+        $result = User::update($this->connection, $id, $data,"id");
+        if($result=="Duplicate") return ['status' => 500, 'data' => ['message' => 'Email already in use']];
+        
+        //good data return
+        if ($result)  return ['status' => 200, 'data' => ['message' => 'user updated successfully']];
+        
 
         return ['status' => 500, 'data' => ['error' => 'Failed to update user']];
     }
 
     public function deleteuser(int $id)
     {
-        $user = User::find($this->connection, $id);
+        $user = User::find($this->connection, $id,"id");
         if (!$user) {
             return ['status' => 404, 'data' => ['error' => 'user not found']];
         }
 
-        $result = User::deleteById($id, $this->connection);
+        $result = User::deleteById($id, $this->connection,"id");
         if ($result) {
             return ['status' => 200, 'data' => ['message' => 'user deleted successfully']];
         }

@@ -2,6 +2,7 @@
 require_once("./services/ResponseService.php");
 include(__DIR__ . "/routes/apis.php");
 
+
 $base_dir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
 $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 

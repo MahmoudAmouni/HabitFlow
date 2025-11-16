@@ -1,5 +1,6 @@
 <?php
 require_once( __DIR__ . "/../models/Habit.php");
+require_once( __DIR__ . "/../models/User.php");
 
 class HabitService
 {
@@ -10,22 +11,45 @@ class HabitService
     {
         $this->connection = $connection;
     }
-    public function getHabits($id)
+    public function getHabitById(int $id): array
     {
-        if ($id) {
-            $habit = Habit::find($this->connection, $id);
-            if ($habit) {
-                return ['status' => 200, 'data' => $habit->toArray()];
-            }
-            return ['status' => 404, 'data' => ['error' => 'habit not found']];
+        try {
+            $habit = Habit::find($this->connection, $id, 'id');
+            return $habit
+                ? ['status' => 200, 'data' => $habit->toArray()]
+                : ['status' => 404, 'data' => ['error' => 'habit not found']];
+        } catch (Throwable $e) {
+            return ['status' => 500, 'data' => ['error' => 'DB error while fetching habit']];
         }
+    }
 
-        $habits = Habit::findAll($this->connection);
-        $data = [];
-        foreach ($habits as $habit) {
-            $data[] = $habit->toArray();
+    public function getHabitsByUserId(int $userId): array
+    {
+        try {
+            $user = User::find($this->connection, $userId, 'id');
+            if (!$user) {
+                return ['status' => 404, 'data' => ['error' => 'No user with this id']];
+            }
+
+            $habits = Habit::findAllById($this->connection, $userId, 'user_id');
+            $data = array_map(fn($habit) => $habit->toArray(), $habits);
+
+            return ['status' => 200, 'data' => $data];
+        } catch (Throwable $e) {
+            return ['status' => 500, 'data' => ['error' => 'DB error while fetching user habits']];
         }
-        return ['status' => 200, 'data' => $data];
+    }
+
+    public function getAllHabits(): array
+    {
+        try {
+            $habits = Habit::findAll($this->connection);
+            $data = array_map(fn($habit) => $habit->toArray(), $habits);
+
+            return ['status' => 200, 'data' => $data];
+        } catch (Throwable $e) {
+            return ['status' => 500, 'data' => ['error' => 'DB error while fetching habits']];
+        }
     }
 
     public function createHabit(array $data): array
@@ -41,7 +65,7 @@ class HabitService
         }
 
         $habitId = Habit::create($this->connection, $data);
-        if ($habitId == 1062) {
+        if ($habitId == "Duplicate") {
             return [
                 'status' => 500,
                 'data' => [
@@ -64,7 +88,7 @@ class HabitService
 
     public function updateHabit(int $id, array $data)
     {
-        $habit = Habit::find($this->connection, $id);
+        $habit = Habit::find($this->connection, $id,"id");
         if (!$habit) {
             return ['status' => 404, 'data' => ['error' => 'habit not found']];
         }
@@ -73,7 +97,10 @@ class HabitService
             return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
         }
 
-        $result = Habit::update($this->connection, $id, $data);
+        $result = Habit::update($this->connection, $id, $data,"id");
+        if ($result == "Duplicate")
+            return ['status' => 500, 'data' => ['message' => 'Habit name already exists']];
+
         if ($result) {
             return ['status' => 200, 'data' => ['message' => 'habit updated successfully']];
         }
@@ -83,12 +110,12 @@ class HabitService
 
     public function deleteHabit(int $id)
     {
-        $habit = Habit::find($this->connection, $id);
+        $habit = Habit::find($this->connection, $id, "id");
         if (!$habit) {
             return ['status' => 404, 'data' => ['error' => 'habit not found']];
         }
 
-        $result = Habit::deleteById($id, $this->connection);
+        $result = Habit::deleteById($id, $this->connection,"id");
         if ($result) {
             return ['status' => 200, 'data' => ['message' => 'habit deleted successfully']];
         }
