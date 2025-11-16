@@ -1,86 +1,109 @@
-    // Dummy data
-    const habits = ['Running', 'Meditation', 'Reading'];
-    const dates = [
-        '2025-11-16',
-        '2025-11-15',
-        '2025-11-14',
-    ];
+import { getAllLogs, getAllHabits, deleteLog, createLog } from "./Apis.js";
 
-    let logs = [
-        { id: 1, habit: 'Running', date: '2025-11-16', text: 'Running 3kms' },
-        { id: 2, habit: 'Meditation', date: '2025-11-15', text: 'Meditated for 20 minutes' },
-        { id: 3, habit: 'Reading', date: '2025-11-14', text: 'Read 30 pages of "Atomic Habits"' },
-        { id: 4, habit: 'Running', date: '2025-11-13', text: 'Running 5kms in rain' }
-    ];
+let habitsData = []; 
 
-    function populateSelects() {
-        const habitSelect = document.getElementById('habit-select');
-        const dateSelect = document.getElementById('date-select');
+async function renderLogs() {
+  const logsContainer = document.getElementById("logs-container");
+  logsContainer.innerHTML = "";
 
-        habits.forEach(habit => {
-            const option = document.createElement('option');
-            option.value = habit;
-            option.textContent = habit;
-            habitSelect.appendChild(option);
-        });
+  const [logsData, fetchedHabitsData] = await Promise.all([
+    getAllLogs(),
+    getAllHabits(),
+  ]);
 
-        dates.forEach(date => {
-            const option = document.createElement('option');
-            option.value = date;
-            option.textContent = new Date(date).toLocaleDateString();
-            dateSelect.appendChild(option);
-        });
+  habitsData = fetchedHabitsData; 
+  
+
+  const habitSelect = document.getElementById("habit-select");
+  habitSelect.innerHTML = "";
+
+  habitsData.map((habit) => {
+    const option = document.createElement("option");
+    option.value = habit.id;
+    option.textContent = habit.name;
+    habitSelect.appendChild(option);
+  });
+
+  // dates.map((date) => {
+  //   const option = document.createElement("option");
+  //   option.value = date;
+  //   option.textContent = new Date(date).toLocaleDateString();
+  //   dateSelect.appendChild(option);
+  // });
+
+  console.log(logsData);
+  console.log(habitsData);
+
+  logsData.map((log) => {
+    const habit = habitsData.find((habit) => habit.id == log.habit_id);
+    const habitName = habit ? habit.name : "Unknown Habit";
+    const habitUnit = habit ? habit.unit : "Unknown unit";
+
+    const logItem = document.createElement("div");
+    logItem.className = "log-item";
+    logItem.innerHTML = `
+            <div class="log-text">${log.value}-${habitUnit} <span style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">(${habitName} • ${log.logged_at})</span></div>
+            <div class="log-actions">
+                <button class="log-btn delete-btn" data-id="${log.id}">🗑️</button>
+            </div>
+        `;
+    logsContainer.appendChild(logItem);
+
+    document.querySelectorAll(".delete-btn").forEach((button)=>{
+        button.addEventListener('click',handleDeleteLog)
+    })
+  });
+}
+
+async function handleDeleteLog(e){
+    const LogId = e.target.dataset.id;
+    if(confirm("Are you sure you want to delete ?")){
+        await deleteLog(LogId)
+        renderLogs()
     }
+}
 
-    function renderLogs() {
-      const logsContainer = document.getElementById("logs-container");
-      logsContainer.innerHTML = "";
+function updateUnitBox() {
+  const habitSelect = document.getElementById("habit-select");
+  const unitBox = document.getElementById("unit-box");
+  const selectedHabitName = habitSelect.value
+    ? habitsData.find((habit) => habit.id == habitSelect.value)?.name
+    : null;
 
-      logs.forEach((log) => {
-        const logItem = document.createElement("div");
-        logItem.className = "log-item";
-        logItem.innerHTML = `
-                <div class="log-text">${
-                  log.text
-                } <span style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">(${
-          log.habit
-        } • ${new Date(log.date).toLocaleDateString()})</span></div>
-                <div class="log-actions">
-                    <button class="log-btn edit-btn" data-id="${
-                      log.id
-                    }">✏️</button>
-                    <button class="log-btn delete-btn" data-id="${
-                      log.id
-                    }">🗑️</button>
-                </div>
-            `;
-        logsContainer.appendChild(logItem);
-      });
+  if (selectedHabitName) {
+    const selectedHabit = habitsData.find(
+      (habit) => habit.name === selectedHabitName
+    );
+    console.log(selectedHabit)
+    unitBox.textContent = selectedHabit ? selectedHabit.unit : "";
+  } else {
+    unitBox.textContent = "";
+  }
+}
+
+document
+  .getElementById("habit-select")
+  .addEventListener("change", updateUnitBox);
+
+document
+  .getElementById("add-log-btn")
+  .addEventListener("click", async function () {
+    const habitSelect = document.getElementById("habit-select");
+    const selectedHabitId = parseInt(habitSelect.value);
+    // const date = document.getElementById("date-select").value;
+    const value = document.getElementById("log-input").value.trim();
+    
+    if (!value) {
+        alert("Please enter a log entry");
+        return;
     }
-    document.getElementById('add-log-btn').addEventListener('click', function() {
-        const habit = document.getElementById('habit-select').value;
-        const date = document.getElementById('date-select').value;
-        const text = document.getElementById('log-input').value.trim();
+    await createLog(value,selectedHabitId)
 
-        if (!text) {
-            alert('Please enter a log entry');
-            return;
-        }
+    document.getElementById("log-input").value = "";
+    await renderLogs();
+  });
 
-        const newLog = {
-            id: Date.now(),
-            habit: habit,
-            date: date,
-            text: text
-        };
-
-        logs.push(newLog);
-        document.getElementById('log-input').value = '';
-        renderLogs();
-    });
-
-
-    window.addEventListener('DOMContentLoaded', function() {
-        populateSelects();
-        renderLogs();
-    });
+window.addEventListener("DOMContentLoaded", async function () {
+  await renderLogs();
+  document.getElementById("unit-box").innerHTML = habitsData[0].unit;
+});
