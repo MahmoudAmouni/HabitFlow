@@ -1,44 +1,44 @@
-.users-container {
+.users-habits-container {
     background-color: var(--card-bg);
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.users-table {
+.users-habits-table {
     width: 100%;
     border-collapse: collapse;
     color: var(--text-white);
 }
 
-.users-table th,
-.users-table td {
+.users-habits-table th,
+.users-habits-table td {
     padding: 1rem;
     text-align: left;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.users-table th {
+.users-habits-table th {
     font-weight: 600;
     color: rgba(255, 255, 255, 0.7);
     background-color: rgba(255, 255, 255, 0.02);
     border-top: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.users-table tr:last-child td {
+.users-habits-table tr:last-child td {
     border-bottom: none;
 }
 
-.users-table tr:hover {
+.users-habits-table tr:hover {
     background-color: rgba(255, 255, 255, 0.02);
 }
 
-.user-actions {
+.action-cell {
     display: flex;
-    gap: 0.5rem;
+    justify-content: center;
 }
 
-.user-btn {
+.delete-btn {
     width: 36px;
     height: 36px;
     border-radius: 0.5rem;
@@ -48,18 +48,6 @@
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 1rem;
-}
-
-.edit-btn {
-    background-color: #61A0FF;
-    color: white;
-}
-
-.edit-btn:hover {
-    background-color: #4d8cff;
-}
-
-.delete-btn {
     background-color: #ff5050;
     color: white;
 }
