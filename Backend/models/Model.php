@@ -6,7 +6,7 @@ abstract class Model
     }
 
     protected static string $table;
-    protected static string $primary_key = "id";
+    // protected static string $primary_key = "id";
 
     //CREATE
     public static function create(mysqli $connection, array $data)
@@ -25,13 +25,13 @@ abstract class Model
         call_user_func_array(array($query, "bind_param"), array_merge(array($types), $params));
         $query->execute();
         if ($connection->errno == 1062)
-            return 1062;
+            return "Duplicate";
         return $connection->insert_id;
 
     }
 
     //UPDATE
-    public static function update(mysqli $connection, int $id, array $data)
+    public static function update(mysqli $connection, int $id, array $data,$primary_key)
     {
         $updates = "";
         $i = 0;
@@ -39,7 +39,7 @@ abstract class Model
             $updates .= ($i === count($data) - 1) ? "" . $key . "= ?" : "" . $key . "= ?,";
             $i++;
         }
-        $sql = sprintf("UPDATE %s SET %s WHERE %s = ?", static::$table, $updates, static::$primary_key);
+        $sql = sprintf("UPDATE %s SET %s WHERE %s = ?", static::$table, $updates, $primary_key);
         $query = $connection->prepare($sql);
         $types = self::getAllTypes($data);
         $types .= "i";
@@ -50,6 +50,9 @@ abstract class Model
         $params[] = &$id;
         call_user_func_array(array($query, "bind_param"), array_merge(array($types), $params));
         $query->execute();
+        if($connection->errno ==1062){
+            return "Duplicate";
+        }
         return $id;
     }
 
@@ -70,14 +73,31 @@ abstract class Model
 
         return $objects;
     }
+    public static function findAllById(mysqli $connection,$id,$primary_key)
+    {
+        $sql = sprintf("SELECT * FROM %s WHERE %s = ? ", static::$table,$primary_key);
+
+        $query = $connection->prepare($sql);
+        $query->bind_param("i", $id);
+        $query->execute();
+
+        $result = $query->get_result();
+        $objects = [];
+
+        while ($row = $result->fetch_assoc()) {
+            $objects[] = new static($row);
+        }
+
+        return $objects;
+    }
 
     //GET_BY_ID
-    public static function find(mysqli $connection, int $id)
+    public static function find(mysqli $connection, int $id,$primary_key)
     {
         $sql = sprintf(
             "SELECT * from %s WHERE %s = ?",
             static::$table,
-            static::$primary_key
+            $primary_key
         );
 
         $query = $connection->prepare($sql);
@@ -90,9 +110,9 @@ abstract class Model
     }
 
     //DELETE_BY_ID
-    public static function deleteById($id, mysqli $connection)
+    public static function deleteById($id, mysqli $connection,$primary_key)
     {
-        $sql = sprintf("DELETE FROM %s WHERE %s = ?", static::$table, static::$primary_key);
+        $sql = sprintf("DELETE FROM %s WHERE %s = ?", static::$table, $primary_key);
         $query = $connection->prepare($sql);
         $query->bind_param("i", $id);
         $query->execute();

@@ -1,47 +1,54 @@
 <?php
 
-require_once(__DIR__ . "/../models/User.php");
+require_once(__DIR__ . "/../models/Habit.php");
 require_once(__DIR__ . "/../connection/connection.php");
 require_once(__DIR__ . "/../services/ResponseService.php");
-require_once(__DIR__ . "/../services/UserService.php");
+require_once(__DIR__ . "/../services/HabitService.php");
 
-class UserController
+class HabitController
 {
-    private UserService $userService;
+    private HabitService $habitService;
 
     public function __construct()
     {
         global $connection;
-        $this->userService = new UserService($connection);
+        $this->habitService = new HabitService($connection);
     }
 
-    public function getUsers()
-    {
-        $id = $id = isset($_GET["id"]) ? $_GET["id"] : null;
-        $result = $this->userService->getUsers($id);
-        echo ResponseService::response($result['status'], $result['data']);
-    }
-    public function getUserByEmail()
+    public function getHabits()
     {
         $input = json_decode(file_get_contents("php://input"), true);
-        $result = $this->userService->getUserByEmail( $input["email"],$input["password"]);
+        $id = $input["id"] ?? null;
+        if ($id) {
+            $result = $this->habitService->getHabitById($id);
+            echo ResponseService::response($result['status'], $result['data']);
+            exit;
+        }
+        $user_id = $input["user_id"] ?? null;
+        if ($user_id) {
+            $result = $this->habitService->getHabitsByUserId($user_id);
+            echo ResponseService::response($result['status'], $result['data']);
+            exit;
+        }
+        $result = $this->habitService->getAllHabits();
         echo ResponseService::response($result['status'], $result['data']);
     }
 
-    public function deleteUser()
-    {
-        $id = $id = isset($_GET["id"]) ? $_GET["id"] : null;
 
+    public function deleteHabit()
+    {
+        $input = json_decode(file_get_contents("php://input"), true);
+        $id =$input["id"];
         if (!$id) {
             echo ResponseService::response(400, ['error' => 'ID is required']);
             return;
         }
 
-        $result = $this->userService->deleteUser($id);
+        $result = $this->habitService->deleteHabit($id);
         echo ResponseService::response($result['status'], $result['data']);
     }
 
-    public function createUser()
+    public function createHabit()
     {
         $input = json_decode(file_get_contents("php://input"), true);
 
@@ -50,25 +57,26 @@ class UserController
             return;
         }
 
-        $result = $this->userService->createUser($input);
+        $result = $this->habitService->createHabit($input);
         echo ResponseService::response($result['status'], $result['data']);
     }
 
-    public function updateUser()
+    public function updateHabit()
     {
-        $id = $_GET['id'] ?? 0;
         $input = json_decode(file_get_contents("php://input"), true);
+        $id = $input["id"]??null;
+        
 
         if (!$id) {
             echo ResponseService::response(400, ['error' => 'ID is required']);
             return;
         }
-
         if (!$input) {
             echo ResponseService::response(400, ['error' => 'provide data to update']);
             return;
         }
-        $result = $this->userService->updateUser($id, $input);
+
+        $result = $this->habitService->updateHabit($id, $input);
         echo ResponseService::response($result['status'], $result['data']);
     }
 }
