@@ -1,4 +1,4 @@
-import { createHabit, deleteHabit, editHabit, getAllHabits } from "./Apis.js";
+import { createHabit, deleteHabit, editHabit, getAllHabits } from "../Apis/habits.js";
 const params = new URLSearchParams(window.location.search);
 if(params.get("userId")){
  const button = document.getElementById("add-habit-btn");

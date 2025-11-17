@@ -1,4 +1,4 @@
-import { getAllUsers } from "./Apis.js";
+import { getAllUsers } from "../Apis/users.js";
 
 const params = new URLSearchParams(window.location.search);
 const admin = params.get("admin") || null;
