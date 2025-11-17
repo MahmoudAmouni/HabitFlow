@@ -1,4 +1,10 @@
 import { createHabit, deleteHabit, editHabit, getAllHabits } from "./Apis.js";
+const params = new URLSearchParams(window.location.search);
+if(params.get("userId")){
+ const button = document.getElementById("add-habit-btn");
+ button.disabled = true;
+ button.style.cursor = "not-allowed";
+}
 
 let habit_id = null;
 
@@ -17,13 +23,23 @@ async function renderHabits() {
             </div>
         `;
     habitsContainer.appendChild(habitItem);
+    
   });
 
   document.querySelectorAll(".edit-btn").forEach((button) => {
     button.addEventListener("click", handleEditClick);
+    if (params.get("userId")) {
+
+      button.disabled = true;
+      button.style.cursor = "not-allowed";
+    }
   });
   document.querySelectorAll(".delete-btn").forEach((button) => {
     button.addEventListener("click", handleDeleteClick);
+    if (params.get("userId")) {
+      button.disabled = true;
+      button.style.cursor = "not-allowed";
+    }
   });
 }
 
@@ -34,16 +50,16 @@ function handleEditClick(e) {
   document.getElementById("habit-name").value = "";
   document.getElementById("habit-unit").value = "";
   document.getElementById("habit-target").value = "";
-  habit_id = habitId; 
-  document.getElementById("save-habit-btn").textContent = "Update Habit"; 
+  habit_id = habitId;
+  document.getElementById("save-habit-btn").textContent = "Update Habit";
 }
 
-async function handleDeleteClick(e){
-const habitId = e.target.dataset.id
-if(confirm("Are you sure u want to delete ?")){
-    const data = await deleteHabit(habitId)
-    renderHabits()
-}
+async function handleDeleteClick(e) {
+  const habitId = e.target.dataset.id;
+  if (confirm("Are you sure u want to delete ?")) {
+    const data = await deleteHabit(habitId);
+    renderHabits();
+  }
 }
 
 document.getElementById("add-habit-btn").addEventListener("click", function () {
@@ -53,7 +69,7 @@ document.getElementById("add-habit-btn").addEventListener("click", function () {
   document.getElementById("habit-unit").value = "";
   document.getElementById("habit-target").value = "";
   habit_id = null;
-  document.getElementById("save-habit-btn").textContent = "Add Habit"; 
+  document.getElementById("save-habit-btn").textContent = "Add Habit";
 });
 
 function closeModal() {

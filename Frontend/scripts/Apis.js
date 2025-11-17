@@ -1,3 +1,4 @@
+const params = new URLSearchParams(window.location.search);
 export async function createUser(
   username,
   email,
@@ -43,37 +44,56 @@ export async function getUserByEmail(email, password) {
         }),
       }
     );
-    const data = await res.json()
-    return data.data
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+export async function getUserById(id) {
+  try {
+    const res = await fetch(
+      `http://localhost/HabitFlow/Backend/users?id=${id}`
+    );
+    const data = await res.json();
+    return data;
   } catch (error) {
     console.log(error);
   }
 }
 
-export async function createHabit(name,unit,target){
+export async function createHabit(name, unit, target) {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   try {
-    const res = await fetch("http://localhost/HabitFlow/Backend/habits/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_id: user.id,
-        name,
-        unit,
-        target,
-      }),
-    });
+    const res = await fetch(
+      "http://localhost/HabitFlow/Backend/habits/create",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: user.id,
+          name,
+          unit,
+          target,
+        }),
+      }
+    );
     const data = await res.json();
-    return data
+    return data;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
-export async function getAllHabits(){
-   const user = JSON.parse(localStorage.getItem("user") || "null");
+export async function getAllHabits() {
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const id = params.get("userId") ? Number(params.get("userId")) : user.id;
+  console.log(params)
+  console.log(params.get("admin"));
+  console.log(Number(params.get("userId")));
+  console.log(params.get("userId"));
   try {
     const res = await fetch("http://localhost/HabitFlow/Backend/habits", {
       method: "POST",
@@ -81,17 +101,17 @@ export async function getAllHabits(){
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        user_id:user.id,
+        user_id: id,
       }),
     });
-    const data = await res.json()
+    const data = await res.json();
     return data.data;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
-export async function editHabit(name,unit,target,id){
+export async function editHabit(name, unit, target, id) {
   try {
     const res = await fetch(
       "http://localhost/HabitFlow/Backend/habits/update",
@@ -108,27 +128,6 @@ export async function editHabit(name,unit,target,id){
         }),
       }
     );
-    const data = await res.json()
-    return data
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-export async function deleteHabit(id) {
-  try {
-    const res = await fetch(
-      "http://localhost/HabitFlow/Backend/habits/delete",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id
-        }),
-      }
-    );
     const data = await res.json();
     return data;
   } catch (error) {
@@ -136,32 +135,10 @@ export async function deleteHabit(id) {
   }
 }
 
-
-
-export async function getAllLogs(){
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  try {
-    const res = await fetch("http://localhost/HabitFlow/Backend/logs", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_id: user.id,
-      }),
-    });
-    const data = await res.json();
-    return data.data;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-
-export async function deleteLog(id) {
+export async function deleteHabit(id) {
   try {
     const res = await fetch(
-      "http://localhost/HabitFlow/Backend/logs/delete",
+      "http://localhost/HabitFlow/Backend/habits/delete",
       {
         method: "POST",
         headers: {
@@ -179,24 +156,39 @@ export async function deleteLog(id) {
   }
 }
 
-
-export async function createLog(value,habit_id) {
+export async function getAllLogs() {
+  const params = new URLSearchParams(window.location.search);
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const id = Number(params.get("user_id")) ? Number(params.get("id")) : user.id;
+  
   try {
-    const res = await fetch(
-      "http://localhost/HabitFlow/Backend/logs/create",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          habit_id,
-          user_id: user.id,
-          value,
-        }),
-      }
-    );
+    const res = await fetch("http://localhost/HabitFlow/Backend/logs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id: id,
+      }),
+    });
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function deleteLog(id) {
+  try {
+    const res = await fetch("http://localhost/HabitFlow/Backend/logs/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id,
+      }),
+    });
     const data = await res.json();
     return data;
   } catch (error) {
@@ -204,7 +196,52 @@ export async function createLog(value,habit_id) {
   }
 }
 
+export async function createLog(value, habit_id) {
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  try {
+    const res = await fetch("http://localhost/HabitFlow/Backend/logs/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        habit_id,
+        user_id: user.id,
+        value,
+      }),
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
 
+export async function getAllUsers() {
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  try {
+    const res = await fetch("http://localhost/HabitFlow/Backend/users");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
 
-
-
+export async function deleteUser(id) {
+  try {
+    const res = await fetch("http://localhost/HabitFlow/Backend/users/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id,
+      }),
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}

@@ -1,6 +1,17 @@
 import { getAllLogs, getAllHabits, deleteLog, createLog } from "./Apis.js";
-
+const params = new URLSearchParams(window.location.search);
 let habitsData = []; 
+if (params.get("userId")) {
+  const habitSelect = document.getElementById("habit-select");
+  const dateSelect = document.getElementById("date-select");
+  const logSInput = document.getElementById("log-input");
+  habitSelect.disabled = true;
+  dateSelect.disabled = true;
+  logSInput.disabled = true;
+  habitSelect.style.cursor = "not-allowed";
+  dateSelect.style.cursor = "not-allowed";
+  logSInput.style.cursor = "not-allowed";
+}
 
 async function renderLogs() {
   const logsContainer = document.getElementById("logs-container");
@@ -48,12 +59,20 @@ async function renderLogs() {
             </div>
         `;
     logsContainer.appendChild(logItem);
+    
+    
+  });
 
     document.querySelectorAll(".delete-btn").forEach((button)=>{
         button.addEventListener('click',handleDeleteLog)
+        if (params.get("userId")) {
+          button.disabled = true;
+          button.style.cursor = "not-allowed";
+        }
     })
-  });
-}
+    
+  };
+
 
 async function handleDeleteLog(e){
     const LogId = e.target.dataset.id;
