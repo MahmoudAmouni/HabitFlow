@@ -1,66 +1,134 @@
-const DUMMY_DATA = [
-  {
-    type: "ai",
-    text: 'Hi there! I\'m your habit coach. What\'s one thing you\'d like to track today? Just type it in — "walked 25 min", "drank 2 coffees", or "slept at 01:30". I\'ll turn it into clean data for you.',
-  },
-  {
-    type: "user",
-    text: "Walked 30 minutes, drank 1 coffee, slept at 11:30 PM",
-  },
-  {
-    type: "ai",
-    text: "Great job! You're building consistency. Your sleep is improving — last week you were sleeping at 1:15 AM. Keep going!",
-  },
-  { type: "user", text: "I want to drink more water" },
-  {
-    type: "ai",
-    text: "Awesome goal! Try setting a reminder for 3 glasses of water by noon. I'll nudge you if you miss it. Small wins build big habits.",
-  },
-];
+import { getAllAiMeals, getAllAiSummarys } from "../Apis/aiResponse.js";
 
-function createmsg(text, type) {
-  const msgDiv = document.createElement("div");
-  msgDiv.classList.add("chat-msg");
-  msgDiv.classList.add(type === "user" ? "user-input" : "ai-response");
-  msgDiv.textContent = text;
-  return msgDiv;
+let aiSummary;
+let aiMeal;
+
+async function renderResponsesandMeals() {
+  try {
+    // Fetch both API calls
+    const [mealsResponse, summariesResponse] = await Promise.all([
+      getAllAiMeals(),
+      getAllAiSummarys(),
+    ]);
+
+    // Store the data (assuming they return arrays directly)
+    aiMeal = mealsResponse;
+    aiSummary = summariesResponse;
+
+    renderCombinedData();
+  } catch (error) {
+    console.error("Error fetching AI ", error);
+  }
 }
 
-function rendermsgs() {
-  const chatContainer = document.getElementById("chat-container");
-  chatContainer.innerHTML = ""; 
+function formatAndSortData() {
+  const allItems = [];
 
-  DUMMY_DATA.map((msg) => {
-    const msgElement = createmsg(msg.text, msg.type);
-    chatContainer.appendChild(msgElement);
+  // Process meals data
+  if (aiMeal && Array.isArray(aiMeal)) {
+    aiMeal.map((item) => {
+      const createdAt = new Date(item.created_at);
+      console.log(createdAt)
+        allItems.push({
+          type: "meal",
+          title: item.title,
+          summary: item.summary,
+          url: item.url,
+          created_at: createdAt,
+          suggestion: item.url,
+        });
+      
+    });
+  }
+  // console.log(allItems);
+
+  // Process summaries data
+  if (aiSummary && Array.isArray(aiSummary)) {
+    aiSummary.map((item) => {
+     console.log(item)
+
+      const createdAt = new Date(item.created_at).getTime();
+        allItems.push({
+          type: "summary",
+          title: item.title,
+          summary: item.summary,
+          suggestion: item.suggestion,
+          created_at: createdAt,
+          url: item.suggestion,
+        });
+    });
+  }
+
+  // Sort by created_at timestamp (newest first)
+  allItems.sort((a, b) => b.created_at - a.created_at);
+
+  return allItems;
+}
+
+function createAiResponseElement(item) {
+  const responseDiv = document.createElement("div");
+  responseDiv.classList.add("chat-msg", "ai-response");
+
+  let contentHTML = "";
+
+  if (item.type === "meal") {
+    contentHTML = `
+      <div class="ai-meal">
+        <h3>${item.title}</h3>
+        <p>${item.summary}</p>
+        <img src="${item.url}" alt="${item.title}" style="max-width: 200px; border-radius: 8px;">
+      </div>
+    `;
+  } else {
+    // summary
+    contentHTML = `
+      <div class="ai-summary">
+        <h3>${item.title}</h3>
+        <p>${item.summary}</p>
+        <p><strong>Suggestion:</strong> ${item.suggestion}</p>
+      </div>
+    `;
+  }
+
+  // Add timestamp (convert back to readable format)
+  const date = new Date(item.created_at);
+  const options = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  const timestamp = date.toLocaleDateString(undefined, options);
+  contentHTML += `<div class="timestamp">${timestamp}</div>`;
+
+  responseDiv.innerHTML = contentHTML;
+  return responseDiv;
+}
+
+function renderCombinedData() {
+  const allItems = formatAndSortData();
+
+  const chatContainer = document.getElementById("chat-container");
+  chatContainer.innerHTML = "";
+
+  if (allItems.length === 0) {
+    const noDataDiv = document.createElement("div");
+    noDataDiv.classList.add("chat-msg", "ai-response");
+    noDataDiv.textContent = "No AI responses available yet.";
+    chatContainer.appendChild(noDataDiv);
+    return;
+  }
+
+  allItems.map((item) => {
+    const responseElement = createAiResponseElement(item);
+    chatContainer.appendChild(responseElement);
   });
 
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-rendermsgs();
-
-document.getElementById("send-btn").addEventListener("click", function () {
-  const inputField = document.getElementById("user-input");
-  const msg = inputField.value.trim();
-
-  if (msg) {
-    DUMMY_DATA.push({ type: "user", text: msg });
-    rendermsgs();
-    inputField.value = "";
-    setTimeout(() => {
-      DUMMY_DATA.push({
-        type: "ai",
-        text: "Interesting! What else did you notice today?",
-      });
-      rendermsgs();
-    }, 1000);
-  }
-});
-
-document.getElementById("user-input").addEventListener("keydown", function (e) {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    document.getElementById("send-btn").click();
-  }
+// Load data when the page loads
+document.addEventListener("DOMContentLoaded", () => {
+  renderResponsesandMeals();
 });
