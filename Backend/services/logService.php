@@ -25,7 +25,7 @@ class LogService
         }
     }
 
-    public function getLogsByOtherId($id, $key): array
+    public function getLogsByUserId($id, $key): array
     {
         try {
             $data = "";
@@ -39,7 +39,7 @@ class LogService
                 return ['status' => 404, 'data' => ['error' => 'Wrong id']];
             }
 
-            $logs = Log::findAllById($this->connection, $id, $key);
+            $logs = Log::findAllByOtherId($this->connection, $id, $key);
             $data = array_map(fn($log) => $log->toArray(), $logs);
 
             return ['status' => 200, 'data' => $data];
@@ -137,7 +137,7 @@ class LogService
                 return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
             }
 
-            $result = Log::update($this->connection, $id, $data, "id");
+            $result = $log->update($this->connection,  $data, "id");
             if ($result) {
                 return ['status' => 200, 'data' => ['message' => 'log updated successfully']];
             }

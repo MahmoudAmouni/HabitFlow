@@ -100,7 +100,7 @@ class UserService
             if (empty($data))
                 return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
 
-            $result = User::update($this->connection, $id, $data, "id");
+            $result = $user->update($this->connection,  $data, "id");
             if ($result == "Duplicate")
                 return ['status' => 500, 'data' => ['message' => 'Email already in use']];
 

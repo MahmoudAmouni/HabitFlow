@@ -32,7 +32,7 @@ class HabitService
                 return ['status' => 404, 'data' => ['error' => 'No user with this id']];
             }
 
-            $habits = Habit::findAllById($this->connection, $userId, 'user_id');
+            $habits = Habit::findAllByOtherId($this->connection, $userId, 'user_id');
             $data = array_map(fn($habit) => $habit->toArray(), $habits);
 
             return ['status' => 200, 'data' => $data];
@@ -106,7 +106,7 @@ class HabitService
                 return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
             }
 
-            $result = Habit::update($this->connection, $id, $data, "id");
+            $result = $habit->update($this->connection, $data, "id");
             if ($result == "Duplicate")
                 return ['status' => 500, 'data' => ['message' => 'Habit name already exists']];
 

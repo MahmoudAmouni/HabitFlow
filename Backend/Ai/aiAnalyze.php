@@ -37,7 +37,7 @@ if ($habitsResult['status'] !== 200) {
     exit;
 }
 
-$logsResult = $logService->getLogsByOtherId($userId,'user_id');
+$logsResult = $logService->getLogsByUserId($userId,'user_id');
 if ($logsResult['status'] !== 200) {
     echo json_encode(["status" => 404, "message" => "no logs found"]);
     exit;

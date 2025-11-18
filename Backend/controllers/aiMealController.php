@@ -17,9 +17,17 @@ class AiMealController
 
     public function getAiMeals()
     {
-        $result = $this->aiMealService->getAiMeal();
+        $input = json_decode(file_get_contents("php://input"), true);
+        if($input['user_id']){
+            $user_id = $input['user_id'];
+            $result = $this->aiMealService->getAiMealsByUserId($user_id,'user_id');
+        }else{
+
+            $result = $this->aiMealService->getAiMeal();
+        } 
         echo ResponseService::response($result['status'], $result['data']);
     }
+
 
 
     public function deleteAiMeal()

@@ -17,7 +17,14 @@ class AiResponseController
 
     public function getAiResponses()
     {
-        $result = $this->aiResponseService->getAiResponse();
+        $input = json_decode(file_get_contents("php://input"), true);
+        if ($input['user_id']) {
+            $user_id = $input['user_id'];
+            echo ''. $user_id .'';
+            $result = $this->aiResponseService->getAiResponsesByUserId($user_id, 'user_id');
+        }else{
+            $result = $this->aiResponseService->getAiResponse();
+        }
         echo ResponseService::response($result['status'], $result['data']);
     }
 
