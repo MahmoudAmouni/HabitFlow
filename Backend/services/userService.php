@@ -49,7 +49,7 @@ class UserService
         }
     }
 
-    public function createuser(array $data): array
+    public function createUser(array $data): array
     {
         try {
             $requiredFields = ['name', 'email', 'password', 'height', 'weight', 'gender'];
@@ -90,7 +90,7 @@ class UserService
         }
     }
 
-    public function updateuser(int $id, array $data)
+    public function updateUser(int $id, array $data)
     {
         try {
             $user = User::find($this->connection, $id, "id");
@@ -114,7 +114,7 @@ class UserService
         }
     }
 
-    public function deleteuser(int $id)
+    public function deleteUser(int $id)
     {
         try {
             $user = User::find($this->connection, $id, "id");

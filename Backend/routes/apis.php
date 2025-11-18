@@ -18,6 +18,11 @@ $routes = [
     '/logs/update' => ['controllers' => 'logController', 'method' => 'updateLog'],
     '/logs/delete' => ['controllers' => 'logController', 'method' => 'deleteLog'],
 
+    '/aiResponses' => ['controllers' => 'aiResponseController', 'method' => 'getAiResponses'],
+    '/aiResponses/create' => ['controllers' => 'aiResponseController', 'method' => 'createAiResponse'],
+    '/aiResponses/update' => ['controllers' => 'aiResponseController', 'method' => 'updateAiResponse'],
+    '/aiResponses/delete' => ['controllers' => 'aiResponseController', 'method' => 'deleteAiResponse'],
+
 
     '/AiAnalyze' => ['controllers' => 'AiAnalyze.php', 'method' => 'analyze'],
 ];
