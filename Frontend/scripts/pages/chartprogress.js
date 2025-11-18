@@ -4,7 +4,7 @@ import { noHabits } from "../components/noHabits.js";
 
 let allHabits;
 let allLogs;
-let chartInstance; 
+let chartInstance;
 
 async function initChart() {
   try {
@@ -79,7 +79,7 @@ function generateDataFromLogs(habitLogs) {
   for (let i = 6; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
-    const dateStr = date.toISOString().split("T")[0]; 
+    const dateStr = date.toISOString().split("T")[0];
     last7Days.push({
       dateStr,
       displayDate: date.toLocaleDateString("en-US", {
@@ -171,7 +171,7 @@ function createChart(containerId, data, title, labels) {
           ticks: { color: "#fff" },
         },
       },
-      animation: { duration: 800, easing: "easeOutQuart" }, 
+      animation: { duration: 800, easing: "easeOutQuart" },
       transitions: {
         active: {
           animation: {
@@ -203,7 +203,7 @@ function updateChartData(newData, newTitle, newLabels) {
 
   chartInstance.options.scales.y.suggestedMax = suggestedMax;
 
-  chartInstance.update("active"); 
+  chartInstance.update("active");
 }
 
 window.addEventListener("DOMContentLoaded", initChart);
