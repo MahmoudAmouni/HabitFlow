@@ -39,6 +39,11 @@
         font-size: 1.75rem;
         font-weight: 600;
         color: var(--text-white);
-        margin-bottom: 1rem;
         text-align: center;
+        margin-top: 1rem;
+    }
+
+    .disabled-button {
+        cursor: not-allowed;
+        opacity: 0.6;
     }
