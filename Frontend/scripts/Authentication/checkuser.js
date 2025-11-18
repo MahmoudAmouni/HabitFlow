@@ -1,4 +1,4 @@
-import { getUserById } from "../Apis.js";
+import { getUserById } from "../Apis/users.js";
 
 const params = new URLSearchParams(window.location.search);
 const id = Number(params.get("id"));
@@ -24,5 +24,5 @@ async function checkUserValidity() {
   }
 }
 if(admin !== userLoalStorage.role){
-  checkUserValidity();
+  // checkUserValidity();
 }

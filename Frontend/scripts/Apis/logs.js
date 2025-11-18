@@ -22,6 +22,28 @@ export async function getAllLogs() {
   }
 }
 
+// export async function getAllLogsByHabitId(habitId){
+//   const user = JSON.parse(localStorage.getItem("user") || "null");
+//   const id = user.id;
+
+//   try {
+//     const res = await fetch("http://localhost/HabitFlow/Backend/logs", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         habit_id: habitId,
+//         user_id:id
+//       }),
+//     });
+//     const data = await res.json();
+//     return data.data;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
 export async function deleteLog(id) {
   try {
     const res = await fetch("http://localhost/HabitFlow/Backend/logs/delete", {

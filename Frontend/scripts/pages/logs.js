@@ -1,4 +1,5 @@
-import { getAllLogs, getAllHabits, deleteLog, createLog } from "../Apis/logs.js";
+import { getAllHabits } from "../Apis/habits.js";
+import { getAllLogs, deleteLog, createLog } from "../Apis/logs.js";
 const params = new URLSearchParams(window.location.search);
 let habitsData = []; 
 if (params.get("userId")) {

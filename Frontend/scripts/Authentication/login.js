@@ -1,4 +1,4 @@
-import { getUserByEmail } from "../Apis.js";
+import { getUserByEmail } from "../Apis/users.js";
 
 //Login
 const loginBtn = document.getElementById("login-btn");

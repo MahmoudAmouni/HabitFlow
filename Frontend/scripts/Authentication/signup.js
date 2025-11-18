@@ -1,4 +1,4 @@
-import { createUser } from "../Apis.js";
+import { createUser } from "../Apis/users.js";
 
 //Sign Up
 const submitBtn = document.getElementById("submit-btn");
