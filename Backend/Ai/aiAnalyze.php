@@ -1,51 +1,79 @@
 <?php
 include("config.php");
-//api key and url are in the config.php 
+require_once(__DIR__ . "/../connection/connection.php");
+require_once(__DIR__ . "/../services/habitService.php");
+require_once(__DIR__ . "/../services/userService.php");
+require_once(__DIR__ . "/../services/logService.php");
+require_once(__DIR__ . "/../services/AiResponseService.php");
+require_once(__DIR__ . "/../services/AiMealService.php");
+require_once(__DIR__ . "/prompts.php");
+require_once(__DIR__ . "/aiHelperFunctions.php");
 
+$habitService = new HabitService($connection);
+$userService = new UserService($connection);
+$logService = new LogService($connection);
+$aiResponseService = new AiResponseService($connection);
+$aiMealService = new AiMealService($connection);
+
+$input = json_decode(file_get_contents('php://input'), true);
+$userId = $input['user_id'] ?? $_GET['user_id'] ?? null;
+
+if (!$userId) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Missing user_id']);
+    exit;
+}
+
+$user = $userService->getUsers($userId);
+if ($user['status'] !== 200) {
+    echo json_encode(["status" => 404, "message" => "no user found"]);
+    exit;
+}
+
+
+$habitsResult = $habitService->getHabitsByUserId($userId);
+if ($habitsResult['status'] !== 200) {
+    echo json_encode(["status" => 404, "message" => "no habits found"]);
+    exit;
+}
+
+$logsResult = $logService->getLogsByOtherId($userId,'user_id');
+if ($logsResult['status'] !== 200) {
+    echo json_encode(["status" => 404, "message" => "no logs found"]);
+    exit;
+}
+$userLogs= $logsResult["data"];
+$userHabits = $habitsResult['data'];
+$text = trim($input['text'] ?? '');
+$type = trim($input['type'] ?? '');
+
+
+if ($text === '' && $type==='') {
+    http_response_code(400);
+    echo json_encode(['error' => 'Empty text']);
+    exit;
+}
+$prompt;
+
+switch ($type) {
+    case 'meal':
+       $prompt = CreateMealAiPrompt($userHabits, $userLogs);
+        break;
+    case 'daily':
+    case 'weekly':
+    case 'monthly':
+        $prompt =CreateSummaryAiPrompt($userHabits, $userLogs, $type);
+        break;
+    case 'log':
+    default:
+       $prompt= CreateLogsAiPrompt($userHabits,$text);
+        break;
+}
 
 $headers = [
     'Content-Type: application/json',
     'Authorization: Bearer ' . $apiKey
 ];
-
-
-$input = json_decode(file_get_contents('php://input'), true);
-$text = trim($input['text'] ?? '');
-
-if ($text === '') {
-    http_response_code(400);
-    echo json_encode(['error' => 'Empty text']);
-    exit;
-}
-
-
-$prompt = "You are a silent JSON-only parser.  
-The user will type a free-text daily log.  
-Extract every quantifiable health habit you see 
-for example:
-    - the user mentiond the food he ate calculate the calories referring for the avg calories for the food he ate
-    - he said that he walked for 25mins calculate the number of steps referring to the speed of an avarege man in walking 
- return ONE flat JSON object with the keys below.  
-If a key is missing from the text, set it to null.  
-Use units exactly as specified.  
-Never add text before or after the JSON.
-
-Keys (all lowercase, snake_case):
-- steps: integer
-- walking_min: integer
-- running_min: integer
-- cycling_min: integer
-- sleep_time: string in 24-hour \"HH:MM\" format (assume same day unless \"am\"/\"pm\" or \"yesterday\" is written)
-- sleep_hours: decimal (hours actually slept if stated, else null)
-- caffeine_mg: integer (assume 80 mg per coffee, 40 mg per tea, 50 mg per soda)
-- alcohol_units: decimal (1 unit = 1 beer / 1 glass wine / 1 shot)
-- water_glasses: integer (250 ml each)
-- calories: integer (only if a number followed by \"kcal\" / \"cal\" is written)
-- mood: string, one of [\"great\", \"good\", \"neutral\", \"bad\", \"awful\"] (pick closest word mentioned)
-- notes: string, any extra text that does not fit above (max 200 chars)
-User Text:" . 
-$text
-;
 
 
 $data = [
@@ -54,9 +82,8 @@ $data = [
         ['role' => 'user', 'content' => $prompt]
     ],
     'max_tokens' => 1000,
-    'temperature' => 0.0
+    'temperature' => $type == 'meal' ? 1.3 : 0.0
 ];
-
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -87,5 +114,32 @@ if (!isset($responseData['choices'][0]['message']['content'])) {
     exit;
 }
 
-echo $responseData['choices'][0]['message']['content'];
+
+
+
+
+$aiResponse = $responseData['choices'][0]['message']['content'];
+$aiResponse = trim($aiResponse);
+if (substr($aiResponse, 0, 7) === '```json') {
+    $aiResponse = substr($aiResponse, 7);
+}
+if (substr($aiResponse, -3) === '```') {
+    $aiResponse = substr($aiResponse, 0, -3);
+}
+$aiResponse = trim($aiResponse);
+
+switch ($type) {
+    case 'meal':
+        processMealResponse($aiResponse, $aiMealService, $userId);
+        break;
+    case 'daily':
+    case 'weekly':
+    case 'monthly':
+        processSummaryResponse($aiResponse, $aiResponseService, $userId);
+        break;
+    case 'log':
+    default:
+        processLogResponse($aiResponse, $logService, $userId);
+        break;
+}
 ?>

@@ -70,6 +70,20 @@ class Log extends Model
         return $this;
     }
 
+
+    public static function findByHabitIdAndDate(mysqli $connection, int $habitId, string $date)
+    {
+        $sql = "SELECT * FROM logs WHERE habit_id = ? AND logged_at = ?";
+        $query = $connection->prepare($sql);
+        $query->bind_param("is", $habitId, $date);
+        $query->execute();
+
+        $data = $query->get_result()->fetch_assoc();
+
+        return $data ?: null;
+    }
+
+
     public function __toString()
     {
         return $this->id . " | " . $this->habit_id . " | "  . $this->logged_at ." | " . $this->value;

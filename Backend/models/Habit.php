@@ -86,7 +86,7 @@ class Habit extends Model
 
     public function __toString()
     {
-        return $this->id . " | " . $this->name . " | " . $this->user_id . " | " . $this->target ." | " . $this->unit;
+        return $this->id . " | " . $this->name . " | " . $this->user_id . " | " . $this->target . " | " . $this->unit;
     }
 
     public function toArray()
