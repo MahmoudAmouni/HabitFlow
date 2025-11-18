@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . "/../models/AiResponse.php");
+require_once(__DIR__ . "/../models/User.php");
 
 class AiResponseService
 {
@@ -22,6 +23,26 @@ class AiResponseService
         } catch (Exception $e) {
             error_log("aiResponseService::getaiResponses error: " . $e->getMessage());
             return ['status' => 500, 'data' => ['error' => 'Database error occurred while fetching aiResponses']];
+        }
+    }
+
+    public function getAiResponsesByUserId($id, $key): array
+    {
+        try {
+            $data = "";
+            if ($key == "user_id") {
+                $data = User::find($this->connection, $id, 'id');
+            } 
+            if (!$data) {
+                return ['status' => 404, 'data' => ['error' => 'Wrong id']];
+            }
+            $aiResponses = AiResponse::findAllByOtherId($this->connection, $id, $key);
+            $data = array_map(fn($aiResponses) => $aiResponses->toArray(), $aiResponses);
+
+            return ['status' => 200, 'data' => $data];
+        } catch (Throwable $e) {
+            error_log("AiResponseService::getLogsByOtherId error: " . $e->getMessage());
+            return ['status' => 500, 'data' => ['error' => 'DB error while fetching user aiResponses' . $e->getMessage() ]];
         }
     }
 
@@ -67,7 +88,7 @@ class AiResponseService
             if (empty($data))
                 return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
 
-            $result = AiResponse::update($this->connection, $id, $data, "id");
+            $result = $aiResponse->update($this->connection, $data, "id");
 
             if ($result)
                 return ['status' => 200, 'data' => ['message' => 'aiResponse updated successfully']];

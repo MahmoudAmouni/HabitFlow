@@ -31,7 +31,7 @@ abstract class Model
     }
 
     //UPDATE
-    public static function update(mysqli $connection, int $id, array $data,$primary_key)
+    public  function update(mysqli $connection, array $data,$primary_key)
     {
         $updates = "";
         $i = 0;
@@ -73,7 +73,7 @@ abstract class Model
 
         return $objects;
     }
-    public static function findAllById(mysqli $connection,$id,$primary_key)
+    public static function findAllByOtherId(mysqli $connection,$id,$primary_key)
     {
         $sql = sprintf("SELECT * FROM %s WHERE %s = ? ", static::$table,$primary_key);
 

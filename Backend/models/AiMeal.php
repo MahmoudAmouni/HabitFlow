@@ -7,6 +7,7 @@ class AiMeal extends Model
     private string $title;
     private string $url;
     private string $summary;
+    private string $created_at;
 
     protected static string $table = "aimeals";
 
@@ -16,6 +17,7 @@ class AiMeal extends Model
         $this->title = $data["title"];
         $this->url = $data["url"];
         $this->summary = $data["summary"];
+        $this->created_at = $data["created_at"];
     }
 
 
@@ -23,12 +25,12 @@ class AiMeal extends Model
 
     public function __toString()
     {
-        return $this->id . " | " . $this->title . " | "  . $this->url . " | " . $this->summary;
+        return $this->id . " | " . $this->title . " | "  . $this->url . " | " . $this->summary . "|" . $this->created_at;
     }
 
     public function toArray()
     {
-        return ["id" => $this->id, "title" => $this->title,  "summary" => $this->summary, "url" => $this->url];
+        return ["id" => $this->id, "title" => $this->title,  "summary" => $this->summary, "created_at" => $this->created_at, "url" => $this->url];
     }
 
 }
