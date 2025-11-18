@@ -4,11 +4,16 @@ require_once(__DIR__ . "/../connection/connection.php");
 require_once(__DIR__ . "/../services/habitService.php");
 require_once(__DIR__ . "/../services/userService.php");
 require_once(__DIR__ . "/../services/logService.php");
+require_once(__DIR__ . "/../services/AiResponseService.php");
+require_once(__DIR__ . "/../services/AiMealService.php");
 require_once(__DIR__ . "/prompts.php");
+require_once(__DIR__ . "/aiHelperFunctions.php");
 
 $habitService = new HabitService($connection);
 $userService = new UserService($connection);
 $logService = new LogService($connection);
+$aiResponseService = new AiResponseService($connection);
+$aiMealService = new AiMealService($connection);
 
 $input = json_decode(file_get_contents('php://input'), true);
 $userId = $input['user_id'] ?? $_GET['user_id'] ?? null;
@@ -32,17 +37,38 @@ if ($habitsResult['status'] !== 200) {
     exit;
 }
 
+$logsResult = $logService->getLogsByOtherId($userId,'user_id');
+if ($logsResult['status'] !== 200) {
+    echo json_encode(["status" => 404, "message" => "no logs found"]);
+    exit;
+}
+$userLogs= $logsResult["data"];
 $userHabits = $habitsResult['data'];
 $text = trim($input['text'] ?? '');
+$type = trim($input['type'] ?? '');
 
-if ($text === '') {
+
+if ($text === '' && $type==='') {
     http_response_code(400);
     echo json_encode(['error' => 'Empty text']);
     exit;
 }
+$prompt;
 
-$prompt = CreateLogsAiPrompt($userHabits, $text);
-
+switch ($type) {
+    case 'meal':
+       $prompt = CreateMealAiPrompt($userHabits, $userLogs);
+        break;
+    case 'daily':
+    case 'weekly':
+    case 'monthly':
+        $prompt =CreateSummaryAiPrompt($userHabits, $userLogs, $type);
+        break;
+    case 'log':
+    default:
+       $prompt= CreateLogsAiPrompt($userHabits,$text);
+        break;
+}
 
 $headers = [
     'Content-Type: application/json',
@@ -56,7 +82,7 @@ $data = [
         ['role' => 'user', 'content' => $prompt]
     ],
     'max_tokens' => 1000,
-    'temperature' => 0.0
+    'temperature' => $type == 'meal' ? 1.3 : 0.0
 ];
 
 $ch = curl_init($url);
@@ -91,52 +117,29 @@ if (!isset($responseData['choices'][0]['message']['content'])) {
 
 
 
+
 $aiResponse = $responseData['choices'][0]['message']['content'];
-$parsedLogs = json_decode($aiResponse, true);
-
-if (!is_array($parsedLogs)) {
-    http_response_code(500);
-    echo json_encode(['error' => 'AI response is not a valid array']);
-    exit;
+$aiResponse = trim($aiResponse);
+if (substr($aiResponse, 0, 7) === '```json') {
+    $aiResponse = substr($aiResponse, 7);
 }
-
-$createdLogs = [];
-$errors = [];
-
-foreach ($parsedLogs as $logEntry) {
-    if (!isset($logEntry['habit_id']) || !isset($logEntry['value'])) {
-        continue;
-    }
-
-    $logData = [
-        'habit_id' => $logEntry['habit_id'],
-        'value' => $logEntry['value'],
-        'user_id' => $userId
-    ];
-
-    $result = $logService->createLog($logData);
-
-    if ($result['status'] === 201 || $result['status'] === 200) {
-        $createdLogs[] = $logEntry;
-    } else {
-        $errors[] = $result['data']['error'] ?? 'Unknown error';
-    }
+if (substr($aiResponse, -3) === '```') {
+    $aiResponse = substr($aiResponse, 0, -3);
 }
+$aiResponse = trim($aiResponse);
 
-if (!empty($createdLogs)) {
-    echo json_encode([
-        'status' => 200,
-        'message' => 'AI logs processed successfully',
-        'created_logs' => $createdLogs,
-        'errors' => $errors
-    ]);
-} else {
-    http_response_code(400);
-    echo json_encode([
-        'status' => 400,
-        'message' => 'No valid logs created',
-        'errors' => !empty($errors) ? $errors : ['No matching habits found']
-    ]);
+switch ($type) {
+    case 'meal':
+        processMealResponse($aiResponse, $aiMealService, $userId);
+        break;
+    case 'daily':
+    case 'weekly':
+    case 'monthly':
+        processSummaryResponse($aiResponse, $aiResponseService, $userId);
+        break;
+    case 'log':
+    default:
+        processLogResponse($aiResponse, $logService, $userId);
+        break;
 }
-
 ?>

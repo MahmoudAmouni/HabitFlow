@@ -6,7 +6,6 @@ class AiResponse extends Model
     private int $id;
     private string $title;
     private string $type;
-    private string $password;
     private string $suggestion;
     private string $summary;
 

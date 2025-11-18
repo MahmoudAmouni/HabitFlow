@@ -24,5 +24,11 @@ $routes = [
     '/aiResponses/delete' => ['controllers' => 'aiResponseController', 'method' => 'deleteAiResponse'],
 
 
+    '/aiMeals' => ['controllers' => 'aiMealController', 'method' => 'getAiMeals'],
+    '/aiMeals/create' => ['controllers' => 'aiMealController', 'method' => 'createAiMeal'],
+    '/aiMeals/update' => ['controllers' => 'aiMealController', 'method' => 'updateAiMeal'],
+    '/aiMeals/delete' => ['controllers' => 'aiMealController', 'method' => 'deleteAiMeal'],
+
+
     '/AiAnalyze' => ['controllers' => 'AiAnalyze.php', 'method' => 'analyze'],
 ];
