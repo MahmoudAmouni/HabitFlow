@@ -1,113 +1,137 @@
 <?php
-require_once( __DIR__ . "/../models/User.php");
+require_once(__DIR__ . "/../models/User.php");
 
 class UserService
 {
-
     private mysqli $connection;
 
     public function __construct(mysqli $connection)
     {
         $this->connection = $connection;
     }
+
     public function getUsers($id)
     {
-        if ($id) {
-            $user = User::find($this->connection, $id);
-            if ($user) {
-                return ['status' => 200, 'data' => $user->toArray()];
+        try {
+            if ($id) {
+                $user = User::find($this->connection, $id, "id");
+                if ($user) {
+                    return ['status' => 200, 'data' => $user->toArray()];
+                }
+                return ['status' => 404, 'data' => ['error' => 'user not found']];
             }
-            return ['status' => 404, 'data' => ['error' => 'user not found']];
-        }
 
-        $users = User::findAll($this->connection);
-        $data = [];
-        foreach ($users as $user) {
-            $data[] = $user->toArray();
-        }
-        return ['status' => 200, 'data' => $data];
-    }
-    public function getUserByEmail($email,$password){
-        if ($email && $password) {
-            $user = User::getUserByEmail($this->connection, $email, $password);
-            if ($user) {
-                return ['status' => 200, 'data' => $user];
+            $users = User::findAll($this->connection);
+            $data = [];
+            foreach ($users as $user) {
+                $data[] = $user->toArray();
             }
-            return ['status' => 404, 'data' => ['error' => 'user not found']];
+            return ['status' => 200, 'data' => $data];
+        } catch (Exception $e) {
+            error_log("UserService::getUsers error: " . $e->getMessage());
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while fetching users']];
+        }
+    }
+
+    public function getUserByEmail($email, $password)
+    {
+        try {
+            if ($email && $password) {
+                $user = User::getUserByEmail($this->connection, $email, $password);
+                if ($user) {
+                    return ['status' => 200, 'data' => $user];
+                }
+                return ['status' => 404, 'data' => ['error' => 'user not found']];
+            }
+        } catch (Exception $e) {
+            error_log("UserService::getUserByEmail error: " . $e->getMessage());
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while fetching user by email']];
         }
     }
 
     public function createuser(array $data): array
     {
-        $requiredFields = ['name', 'email', 'password','height','weight','gender'];
-        foreach ($requiredFields as $field) {
-            if (!isset($data[$field]) || empty(trim($data[$field]))) {
+        try {
+            $requiredFields = ['name', 'email', 'password', 'height', 'weight', 'gender'];
+            foreach ($requiredFields as $field) {
+                if (!isset($data[$field]) || empty(trim($data[$field]))) {
+                    return [
+                        'status' => 400,
+                        'data' => ['error' => "Missing or empty required field: {$field}"]
+                    ];
+                }
+            }
+            $hashed_password = password_hash($data["password"], PASSWORD_DEFAULT);
+            $data["password"] = $hashed_password;
+
+            $userId = User::create($this->connection, $data);
+            if ($userId == "Duplicate") {
                 return [
-                    'status' => 400,
-                    'data' => ['error' => "Missing or empty required field: {$field}"]
+                    'status' => 500,
+                    'data' => [
+                        'message' => 'Duplicated Email'
+                    ]
                 ];
             }
-        }
-        $hashed_password = password_hash($data["password"], PASSWORD_DEFAULT);
-        $data["password"] = $hashed_password;
+            if ($userId) {
+                return [
+                    'status' => 201,
+                    'data' => [
+                        'message' => 'user created successfully',
+                        'id' => $userId
+                    ]
+                ];
+            }
 
-        $userId = User::create($this->connection, $data);
-        if($userId == "Duplicate"){
-            return [
-                'status' => 500,
-                'data' => [
-                    'message' => 'Duplicated Email'
-                ]
-            ];
+            return ['status' => 500, 'data' => ['error' => 'Failed to create user']];
+        } catch (Exception $e) {
+            error_log("UserService::createuser error: " . $e->getMessage());
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while creating user']];
         }
-        if ($userId) {
-            return [
-                'status' => 201,
-                'data' => [
-                    'message' => 'user created successfully',
-                    'id' => $userId
-                ]
-            ];
-        }
-
-        return ['status' => 500, 'data' => ['error' => 'Failed to create user']];
     }
 
     public function updateuser(int $id, array $data)
     {
-        //if no user return
-        $user = User::find($this->connection, $id,"id");
-        if (!$user) return ['status' => 404, 'data' => ['error' => 'user not found']];
-        
-        //if no data return
-        if (empty($data)) return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
-        
+        try {
+            $user = User::find($this->connection, $id, "id");
+            if (!$user)
+                return ['status' => 404, 'data' => ['error' => 'user not found']];
 
-        //duplicate email return
-        $result = User::update($this->connection, $id, $data,"id");
-        if($result=="Duplicate") return ['status' => 500, 'data' => ['message' => 'Email already in use']];
-        
-        //good data return
-        if ($result)  return ['status' => 200, 'data' => ['message' => 'user updated successfully']];
-        
+            if (empty($data))
+                return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
 
-        return ['status' => 500, 'data' => ['error' => 'Failed to update user']];
+            $result = User::update($this->connection, $id, $data, "id");
+            if ($result == "Duplicate")
+                return ['status' => 500, 'data' => ['message' => 'Email already in use']];
+
+            if ($result)
+                return ['status' => 200, 'data' => ['message' => 'user updated successfully']];
+
+            return ['status' => 500, 'data' => ['error' => 'Failed to update user']];
+        } catch (Exception $e) {
+            error_log("UserService::updateuser error: " . $e->getMessage());
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while updating user']];
+        }
     }
 
     public function deleteuser(int $id)
     {
-        $user = User::find($this->connection, $id,"id");
-        if (!$user) {
-            return ['status' => 404, 'data' => ['error' => 'user not found']];
-        }
+        try {
+            $user = User::find($this->connection, $id, "id");
+            if (!$user) {
+                return ['status' => 404, 'data' => ['error' => 'user not found']];
+            }
 
-        $result = User::deleteById($id, $this->connection,"id");
-        if ($result) {
-            return ['status' => 200, 'data' => ['message' => 'user deleted successfully']];
-        }
+            $result = User::deleteById($id, $this->connection, "id");
+            if ($result) {
+                return ['status' => 200, 'data' => ['message' => 'user deleted successfully']];
+            }
 
-        return ['status' => 500, 'data' => ['error' => 'Failed to delete user']];
+            return ['status' => 500, 'data' => ['error' => 'Failed to delete user']];
+        } catch (Exception $e) {
+            error_log("UserService::deleteuser error: " . $e->getMessage());
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while deleting user']];
+        }
     }
-
 }
 ?>
