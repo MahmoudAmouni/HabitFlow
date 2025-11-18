@@ -20,7 +20,6 @@ class AiResponseController
         $input = json_decode(file_get_contents("php://input"), true);
         if ($input['user_id']) {
             $user_id = $input['user_id'];
-            echo ''. $user_id .'';
             $result = $this->aiResponseService->getAiResponsesByUserId($user_id, 'user_id');
         }else{
             $result = $this->aiResponseService->getAiResponse();
