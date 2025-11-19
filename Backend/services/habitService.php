@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . "/../models/Habit.php");
 require_once(__DIR__ . "/../models/User.php");
+require_once(__DIR__ . "/serviceHelper.php");
 
 class HabitService
 {
@@ -11,61 +12,53 @@ class HabitService
         $this->connection = $connection;
     }
 
-    public function getHabitById(int $id): array
+    public function getHabitById(int $id)
     {
         try {
             $habit = Habit::find($this->connection, $id, 'id');
             return $habit
                 ? ['status' => 200, 'data' => $habit->toArray()]
                 : ['status' => 404, 'data' => ['error' => 'habit not found']];
-        } catch (Throwable $e) {
-            error_log("HabitService::getHabitById error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error while fetching habit']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting habit by id: ' . $e->getMessage()]];
         }
     }
 
-    public function getHabitsByUserId(int $userId): array
+    public function getHabitsByUserId(int $userId)
     {
         try {
-            $user = User::find($this->connection, $userId, 'id');
-            if (!$user) {
-                return ['status' => 404, 'data' => ['error' => 'No user with this id']];
+            $validationResult = validateIdExists($this->connection, $userId, "user_id");
+            if (isset($validationResult['status']) && $validationResult['status'] !== 200) {
+                return $validationResult;
             }
 
             $habits = Habit::findAllByOtherId($this->connection, $userId, 'user_id');
             $data = array_map(fn($habit) => $habit->toArray(), $habits);
 
             return ['status' => 200, 'data' => $data];
-        } catch (Throwable $e) {
-            error_log("HabitService::getHabitsByUserId error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error while fetching user habits']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while get habit by user id: ' . $e->getMessage()]];
         }
     }
 
-    public function getAllHabits(): array
+    public function getAllHabits()
     {
         try {
             $habits = Habit::findAll($this->connection);
             $data = array_map(fn($habit) => $habit->toArray(), $habits);
 
             return ['status' => 200, 'data' => $data];
-        } catch (Throwable $e) {
-            error_log("HabitService::getAllHabits error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error while fetching habits']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting all habits: ' . $e->getMessage()]];
         }
     }
 
-    public function createHabit(array $data): array
+    public function createHabit(array $data)
     {
         try {
-            $requiredFields = ['name', 'unit', 'target', 'user_id'];
-            foreach ($requiredFields as $field) {
-                if (!isset($data[$field]) || empty(trim($data[$field]))) {
-                    return [
-                        'status' => 400,
-                        'data' => ['error' => "Missing or empty required field: {$field}"]
-                    ];
-                }
+            $validationResult = validateRequiredFields($data, $this->getRequiredFields());
+            if ($validationResult !== true) {
+                return $validationResult;
             }
 
             $habitId = Habit::create($this->connection, $data);
@@ -88,9 +81,8 @@ class HabitService
             }
 
             return ['status' => 500, 'data' => ['error' => 'Failed to create habit']];
-        } catch (Throwable $e) {
-            error_log("HabitService::createHabit error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error occurred while creating habit']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while creating habit: ' . $e->getMessage()]];
         }
     }
 
@@ -107,17 +99,17 @@ class HabitService
             }
 
             $result = $habit->update($this->connection, $data, "id");
-            if ($result == "Duplicate")
+            if ($result == "Duplicate") {
                 return ['status' => 500, 'data' => ['message' => 'Habit name already exists']];
+            }
 
             if ($result) {
                 return ['status' => 200, 'data' => ['message' => 'habit updated successfully']];
             }
 
             return ['status' => 500, 'data' => ['error' => 'Failed to update habit']];
-        } catch (Throwable $e) {
-            error_log("HabitService::updateHabit error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error occurred while updating habit']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while updating habit: ' . $e->getMessage()]];
         }
     }
 
@@ -135,10 +127,16 @@ class HabitService
             }
 
             return ['status' => 500, 'data' => ['error' => 'Failed to delete habit']];
-        } catch (Throwable $e) {
-            error_log("HabitService::deleteHabit error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error occurred while deleting habit']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while deleting habit: ' . $e->getMessage()]];
         }
+    }
+
+   
+
+    private function getRequiredFields()
+    {
+        return ['name', 'unit', 'target', 'user_id'];
     }
 }
 ?>

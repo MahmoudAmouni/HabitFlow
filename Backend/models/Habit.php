@@ -60,7 +60,7 @@ class Habit extends Model
         return $this;
     }
 
-    public function setUser_id(string $user_id): self
+    public function setUser_id(int $user_id): self
     {
         $this->user_id = $user_id;
         return $this;
@@ -91,7 +91,7 @@ class Habit extends Model
 
     public function toArray()
     {
-        return ["id" => $this->id, "name" => $this->name, "user_id" => $this->user_id, "unit" => $this->unit];
+        return ["id" => $this->id, "name" => $this->name, "user_id" => $this->user_id, "unit" => $this->unit, "target" => $this->target];
     }
 
 }

@@ -37,7 +37,7 @@ if ($habitsResult['status'] !== 200) {
     exit;
 }
 
-$logsResult = $logService->getLogsByUserId($userId,'user_id');
+$logsResult = $logService->getLogsByOtherId($userId,'user_id');
 if ($logsResult['status'] !== 200) {
     echo json_encode(["status" => 404, "message" => "no logs found"]);
     exit;
@@ -116,8 +116,6 @@ if (!isset($responseData['choices'][0]['message']['content'])) {
 
 
 
-
-
 $aiResponse = $responseData['choices'][0]['message']['content'];
 $aiResponse = trim($aiResponse);
 if (substr($aiResponse, 0, 7) === '```json') {
@@ -139,7 +137,8 @@ switch ($type) {
         break;
     case 'log':
     default:
-        processLogResponse($aiResponse, $logService, $userId);
-        break;
+        echo $responseData['choices'][0]['message']['content'];
+        exit;
 }
+
 ?>

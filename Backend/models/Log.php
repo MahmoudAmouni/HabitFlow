@@ -86,7 +86,7 @@ class Log extends Model
 
     public function __toString()
     {
-        return $this->id . " | " . $this->habit_id . " | "  . $this->logged_at ." | " . $this->value;
+        return $this->id . " | " . $this->habit_id . " | "  . $this->logged_at ." | " . $this->value . " | " . $this->user_id;
     }
 
     public function toArray()

@@ -35,6 +35,7 @@ abstract class Model
     {
         $updates = "";
         $i = 0;
+        $id = $this->getId();
         foreach ($data as $key => &$value) {
             $updates .= ($i === count($data) - 1) ? "" . $key . "= ?" : "" . $key . "= ?,";
             $i++;

@@ -24,6 +24,7 @@ function processMealResponse($aiResponse, $aiMealService, $userId = null)
         ]);
         exit;
     }
+    $parsedMeal['user_id'] = $userId;
 
 
     $result = $aiMealService->createAiMeal($parsedMeal);
@@ -87,60 +88,60 @@ function processSummaryResponse($aiResponse, $aiResponseService, $type )
     }
 }
 
-function processLogResponse($aiResponse, $logService, $userId)
-{
-    $parsedLogs = json_decode($aiResponse, true);
+// function processLogResponse($aiResponse, $logService, $userId)
+// {
+//     $parsedLogs = json_decode($aiResponse, true);
 
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        http_response_code(500);
-        echo json_encode(['error' => 'Invalid JSON from AI response: ' . json_last_error_msg()]);
-        exit;
-    }
+//     if (json_last_error() !== JSON_ERROR_NONE) {
+//         http_response_code(500);
+//         echo json_encode(['error' => 'Invalid JSON from AI response: ' . json_last_error_msg()]);
+//         exit;
+//     }
 
-    if (!is_array($parsedLogs)) {
-        http_response_code(500);
-        echo json_encode(['error' => 'AI response is not a valid array']);
-        exit;
-    }
+//     if (!is_array($parsedLogs)) {
+//         http_response_code(500);
+//         echo json_encode(['error' => 'AI response is not a valid array']);
+//         exit;
+//     }
 
-    $createdLogs = [];
-    $errors = [];
+//     $createdLogs = [];
+//     $errors = [];
 
-    foreach ($parsedLogs as $logEntry) {
-        if (!isset($logEntry['habit_id']) || !isset($logEntry['value'])) {
-            continue;
-        }
+//     foreach ($parsedLogs as $logEntry) {
+//         if (!isset($logEntry['habit_id']) || !isset($logEntry['value'])) {
+//             continue;
+//         }
 
-        $logData = [
-            'habit_id' => $logEntry['habit_id'],
-            'value' => $logEntry['value'],
-            'user_id' => $userId
-        ];
+//         $logData = [
+//             'habit_id' => $logEntry['habit_id'],
+//             'value' => $logEntry['value'],
+//             'user_id' => $userId
+//         ];
 
-        $result = $logService->createLog($logData);
+//         $result = $logService->createLog($logData);
 
-        if ($result['status'] === 201 || $result['status'] === 200) {
-            $createdLogs[] = $logEntry;
-        } else {
-            $errors[] = $result['data']['error'] ?? 'Unknown error';
-        }
-    }
+//         if ($result['status'] === 201 || $result['status'] === 200) {
+//             $createdLogs[] = $logEntry;
+//         } else {
+//             $errors[] = $result['data']['error'] ?? 'Unknown error';
+//         }
+//     }
 
-    if (!empty($createdLogs)) {
-        echo json_encode([
-            'status' => 200,
-            'message' => 'AI logs processed successfully',
-            'created_logs' => $createdLogs,
-            'errors' => $errors
-        ]);
-    } else {
-        http_response_code(400);
-        echo json_encode([
-            'status' => 400,
-            'message' => 'No valid logs created',
-            'errors' => !empty($errors) ? $errors : ['No matching habits found']
-        ]);
-    }
-}
+//     if (!empty($createdLogs)) {
+//         echo json_encode([
+//             'status' => 200,
+//             'message' => 'AI logs processed successfully',
+//             'created_logs' => $createdLogs,
+//             'errors' => $errors
+//         ]);
+//     } else {
+//         http_response_code(400);
+//         echo json_encode([
+//             'status' => 400,
+//             'message' => 'No valid logs created',
+//             'errors' => !empty($errors) ? $errors : ['No matching habits found']
+//         ]);
+//     }
+// }
 
 ?>

@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . "/../models/AiResponse.php");
 require_once(__DIR__ . "/../models/User.php");
+require_once(__DIR__ . "/serviceHelper.php");
 
 class AiResponseService
 {
@@ -15,49 +16,36 @@ class AiResponseService
     {
         try {
             $aiResponses = AiResponse::findAll($this->connection);
-            $data = [];
-            foreach ($aiResponses as $aiResponse) {
-                $data[] = $aiResponse->toArray();
-            }
+            $data = array_map(fn($aiResponse) => $aiResponse->toArray(), $aiResponses);
             return ['status' => 200, 'data' => $data];
         } catch (Exception $e) {
-            error_log("aiResponseService::getaiResponses error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while fetching aiResponses']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting ai response: ' . $e->getMessage()]];
         }
     }
 
     public function getAiResponsesByUserId($id, $key): array
     {
         try {
-            $data = "";
-            if ($key == "user_id") {
-                $data = User::find($this->connection, $id, 'id');
-            } 
-            if (!$data) {
-                return ['status' => 404, 'data' => ['error' => 'Wrong id']];
+            $data = validateIdExists($this->connection, $id, $key);
+            if (isset($data['status']) && $data['status'] !== 200) {
+                return $data;
             }
+
             $aiResponses = AiResponse::findAllByOtherId($this->connection, $id, $key);
-            $data = array_map(fn($aiResponses) => $aiResponses->toArray(), $aiResponses);
+            $data = array_map(fn($aiResponse) => $aiResponse->toArray(), $aiResponses);
 
             return ['status' => 200, 'data' => $data];
-        } catch (Throwable $e) {
-            error_log("AiResponseService::getLogsByOtherId error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error while fetching user aiResponses' . $e->getMessage() ]];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting response by user id: ' . $e->getMessage()]];
         }
     }
-
 
     public function createAiResponse(array $data): array
     {
         try {
-            $requiredFields = ['title','type','suggestion','summary'];
-            foreach ($requiredFields as $field) {
-                if (!isset($data[$field]) || empty(trim($data[$field]))) {
-                    return [
-                        'status' => 400,
-                        'data' => ['error' => "Missing or empty required field: {$field}"]
-                    ];
-                }
+            $validationResult = validateRequiredFields($data, $this->getRequiredFields());
+            if ($validationResult !== true) {
+                return $validationResult;
             }
 
             $aiResponseId = AiResponse::create($this->connection, $data);
@@ -73,8 +61,7 @@ class AiResponseService
 
             return ['status' => 500, 'data' => ['error' => 'Failed to create aiResponse']];
         } catch (Exception $e) {
-            error_log("aiResponseService::createaiResponse error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while creating aiResponse']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while creating ai response: ' . $e->getMessage()]];
         }
     }
 
@@ -82,21 +69,23 @@ class AiResponseService
     {
         try {
             $aiResponse = AiResponse::find($this->connection, $id, "id");
-            if (!$aiResponse)
+            if (!$aiResponse) {
                 return ['status' => 404, 'data' => ['error' => 'aiResponse not found']];
+            }
 
-            if (empty($data))
+            if (empty($data)) {
                 return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
+            }
 
             $result = $aiResponse->update($this->connection, $data, "id");
 
-            if ($result)
+            if ($result) {
                 return ['status' => 200, 'data' => ['message' => 'aiResponse updated successfully']];
+            }
 
             return ['status' => 500, 'data' => ['error' => 'Failed to update aiResponse']];
         } catch (Exception $e) {
-            error_log("aiResponseService::updateaiResponse error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while updating aiResponse']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while updating ai response: ' . $e->getMessage()]];
         }
     }
 
@@ -115,9 +104,15 @@ class AiResponseService
 
             return ['status' => 500, 'data' => ['error' => 'Failed to delete aiResponse']];
         } catch (Exception $e) {
-            error_log("aiResponseService::deleteaiResponse error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while deleting aiResponse']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while deleting ai response: ' . $e->getMessage()]];
         }
+    }
+
+
+
+    private function getRequiredFields()
+    {
+        return ['title', 'type', 'suggestion', 'summary'];
     }
 }
 ?>

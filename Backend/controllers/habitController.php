@@ -17,67 +17,81 @@ class HabitController
 
     public function getHabits()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
-        $id = $input["id"] ?? null;
-        if ($id) {
-            $result = $this->habitService->getHabitById($id);
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
+            $id = $input["id"] ?? null;
+            if ($id) {
+                $result = $this->habitService->getHabitById($id);
+                echo ResponseService::response($result['status'], $result['data']);
+                exit;
+            }
+            $user_id = $input["user_id"] ?? null;
+            if ($user_id) {
+                $result = $this->habitService->getHabitsByUserId($user_id);
+                echo ResponseService::response($result['status'], $result['data']);
+                exit;
+            }
+            $result = $this->habitService->getAllHabits();
             echo ResponseService::response($result['status'], $result['data']);
-            exit;
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while getting habits: ' . $e->getMessage()]);
         }
-        $user_id = $input["user_id"] ?? null;
-        if ($user_id) {
-            $result = $this->habitService->getHabitsByUserId($user_id);
-            echo ResponseService::response($result['status'], $result['data']);
-            exit;
-        }
-        $result = $this->habitService->getAllHabits();
-        echo ResponseService::response($result['status'], $result['data']);
     }
-
 
     public function deleteHabit()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
-        $id =$input["id"];
-        if (!$id) {
-            echo ResponseService::response(400, ['error' => 'ID is required']);
-            return;
-        }
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
+            $id = $input["id"];
+            if (!$id) {
+                echo ResponseService::response(400, ['error' => 'ID is required']);
+                return;
+            }
 
-        $result = $this->habitService->deleteHabit($id);
-        echo ResponseService::response($result['status'], $result['data']);
+            $result = $this->habitService->deleteHabit($id);
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while deleting the habit: ' . $e->getMessage()]);
+        }
     }
 
     public function createHabit()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
 
-        if (!$input) {
-            echo ResponseService::response(400, ['error' => 'No data provided']);
-            return;
+            if (!$input) {
+                echo ResponseService::response(400, ['error' => 'No data provided']);
+                return;
+            }
+
+            $result = $this->habitService->createHabit($input);
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while creating the habit: ' . $e->getMessage()]);
         }
-
-        $result = $this->habitService->createHabit($input);
-        echo ResponseService::response($result['status'], $result['data']);
     }
 
     public function updateHabit()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
-        $id = $input["id"]??null;
-        
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
+            $id = $input["id"] ?? null;
 
-        if (!$id) {
-            echo ResponseService::response(400, ['error' => 'ID is required']);
-            return;
-        }
-        if (!$input) {
-            echo ResponseService::response(400, ['error' => 'provide data to update']);
-            return;
-        }
+            if (!$id) {
+                echo ResponseService::response(400, ['error' => 'ID is required']);
+                return;
+            }
+            if (!$input) {
+                echo ResponseService::response(400, ['error' => 'provide data to update']);
+                return;
+            }
 
-        $result = $this->habitService->updateHabit($id, $input);
-        echo ResponseService::response($result['status'], $result['data']);
+            $result = $this->habitService->updateHabit($id, $input);
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while updating the habit: ' . $e->getMessage()]);
+        }
     }
 }
 ?>
