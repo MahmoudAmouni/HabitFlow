@@ -1,29 +1,11 @@
+import { handleCreateLogsFromAiResponse } from "../Apis/aiResponse.js";
+import { createLogFromAiResponse } from "../Apis/logs.js";
+
 let aiResponse;
-const dummyDATA = [
-  {
-    habit_name: "Running",
-    value: 2,
-    unit: "km",
-  },
-  {
-    habit_name: "Running",
-    value: 2,
-    unit: "km",
-  },
-
-  {
-    habit_name: "Running",
-    value: 2,
-    unit: "km",
-  },
-
-  {
-    habit_name: "Running",
-    value: 2,
-    unit: "km",
-  },
-];
-
+async function handleInput(text) {
+  aiResponse = await handleCreateLogsFromAiResponse(text);
+  console.log(aiResponse);
+}
 
 function showCardModal() {
   document.getElementById("cardModal").style.display = "flex";
@@ -33,32 +15,36 @@ function closeCardModal() {
   document.getElementById("cardModal").style.display = "none";
 }
 
-function submitCard() {
-  const input = document.querySelector(".modal-input");
-  console.log("Submitted:", input.value);
-
+async function submitCard() {
+  await createLogFromAiResponse();
   closeCardModal();
 }
+
+// Add event listeners for both close buttons
 document.getElementById("close-btn").addEventListener("click", () => {
   closeCardModal();
 });
 
+document.getElementById("close-btn2").addEventListener("click", () => {
+  closeCardModal();
+});
+
+// Add event listener for submit button
+document.getElementById("submit-btn").addEventListener("click", () => {
+  submitCard();
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   const addButton = document.getElementById("send-btn");
-  if (addButton) {
-    addButton.addEventListener("click", () => {
-      showCardModal();
-      aiResponse = dummyDATA;
-      document.getElementById("habit-data").innerHTML = dummyDATA
-        .map((item) => {
-          return `<p>${item.habit_name}: ${item.value} ${item.unit}</p>`;
-        })
-        .join("");
-    });
-  }
 
-  const blueArrowButton = document.getElementById("blue-arrow-button");
-  if (blueArrowButton) {
-    blueArrowButton.addEventListener("click", showCardModal);
-  }
+  addButton.addEventListener("click", async () => {
+    const userInput = document.getElementById("user-input").value;
+    await handleInput(userInput);
+    showCardModal();
+    document.getElementById("habit-data").innerHTML = aiResponse
+      .map((item) => {
+        return `<p class="user-input-logs">${item.habit_name.toUpperCase()}: ${item.value} ${item.unit}</p>`;
+      })
+      .join("");
+  });
 });

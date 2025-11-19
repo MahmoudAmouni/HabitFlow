@@ -1,27 +1,7 @@
-async function createAiSummary(type){
-      const user = JSON.parse(localStorage.getItem("user") || "null");
-    try {
-        const res = await fetch(
-          "http://localhost/HabitFlow/Backend/AiAnalyze",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user_id: user.id,
-              type
-            }),
-          }
-        );
-        const data = await res.json()
-        return data.data
-    } catch (error) {
-        console.looh(error)
-    }
-}
+const user = JSON.parse(localStorage.getItem("user") || "null");
 
-async function createAiMeal() {
+ export async function createAiSummary(type) {
+  const user = JSON.parse(localStorage.getItem("user") || "null");
   try {
     const res = await fetch("http://localhost/HabitFlow/Backend/AiAnalyze", {
       method: "POST",
@@ -30,39 +10,54 @@ async function createAiMeal() {
       },
       body: JSON.stringify({
         user_id: user.id,
-        type:'meal',
+        type,
       }),
     });
     const data = await res.json();
-    return data.data
+    return data.data;
   } catch (error) {
     console.looh(error);
   }
 }
 
-
-async function handleCreateLogsFromAiResponse(text){
-    try {
-        const res = await fetch(
-          "http://localhost/HabitFlow/Backend/AiAnalyze",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user_id: user.id,
-              text
-            }),
-          }
-        );
-        const data = await res.json();
-        return data.data;
-    } catch (error) {
-        console.log(error)
-    }
+export async function createAiMeal() {
+  try {
+    const res = await fetch("http://localhost/HabitFlow/Backend/AiAnalyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id: user.id,
+        type: "meal",
+      }),
+    });
+    const data = await res.json();
+    
+    return data.data;
+  } catch (error) {
+    console.looh(error);
+  }
 }
 
+export async function handleCreateLogsFromAiResponse(text) {
+  try {
+    const res = await fetch("http://localhost/HabitFlow/Backend/AiAnalyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id: user.id,
+        text,
+      }),
+    });
+    const data = await res.json();console.log(data);
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 export async function getAllAiSummarys() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -78,12 +73,11 @@ export async function getAllAiSummarys() {
       }),
     });
     const data = await res.json();
-    return data.data
+    return data.data;
   } catch (error) {
     console.log(error);
   }
 }
-
 
 export async function getAllAiMeals() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -104,7 +98,6 @@ export async function getAllAiMeals() {
     console.log(error);
   }
 }
-
 
 export async function deleteAiMeal(id) {
   try {

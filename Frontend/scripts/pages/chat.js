@@ -106,10 +106,10 @@ function createAiResponseElement(item) {
 
   responseDiv.innerHTML = contentHTML;
 
-  // Add event listener to the delete button
+
   const deleteBtn = responseDiv.querySelector(".delete-btn");
   deleteBtn.addEventListener("click", (e) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation(); 
     handleDelete(item.id, item.type);
   });
 

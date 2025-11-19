@@ -301,6 +301,10 @@
     text-align: right;
 }
 
+.user-input-logs{
+    font-size: 1.3rem;
+}
+
 @media (max-width: 768px) {
     .sidebar {
         width: 80px;

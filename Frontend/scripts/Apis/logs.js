@@ -102,3 +102,23 @@ export async function createLog(value, habit_id,date) {
     console.log(error);
   }
 }
+
+
+export async function createLogFromAiResponse(array_data) {
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  try {
+    const res = await fetch("http://localhost/HabitFlow/Backend/logs/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        
+      }),
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
