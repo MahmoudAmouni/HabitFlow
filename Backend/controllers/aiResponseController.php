@@ -30,8 +30,8 @@ class AiResponseController
 
     public function deleteAiResponse()
     {
-        $id = $id = isset($_GET["id"]) ? $_GET["id"] : null;
-
+        $input = json_decode(file_get_contents("php://input"), true);
+        $id = $input["id"];
         if (!$id) {
             echo ResponseService::response(400, ['error' => 'ID is required']);
             return;
@@ -56,9 +56,9 @@ class AiResponseController
 
     public function updateAiResponse()
     {
-        $id = $_GET['id'] ?? 0;
+        
         $input = json_decode(file_get_contents("php://input"), true);
-
+        $id = $input["id"];
         if (!$id) {
             echo ResponseService::response(400, ['error' => 'ID is required']);
             return;

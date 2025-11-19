@@ -24,6 +24,7 @@ function processMealResponse($aiResponse, $aiMealService, $userId = null)
         ]);
         exit;
     }
+    $parsedMeal['user_id'] = $userId;
 
 
     $result = $aiMealService->createAiMeal($parsedMeal);

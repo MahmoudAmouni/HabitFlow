@@ -30,7 +30,9 @@ class UserController
 
     public function deleteUser()
     {
-        $id = $id = isset($_GET["id"]) ? $_GET["id"] : null;
+        
+        $input = json_decode(file_get_contents("php://input"), true);
+        $id = $input["id"];
 
         if (!$id) {
             echo ResponseService::response(400, ['error' => 'ID is required']);
@@ -56,8 +58,9 @@ class UserController
 
     public function updateUser()
     {
-        $id = $_GET['id'] ?? 0;
         $input = json_decode(file_get_contents("php://input"), true);
+        $id = $id = isset($_GET["id"]) ? $_GET["id"] : null;
+        
 
         if (!$id) {
             echo ResponseService::response(400, ['error' => 'ID is required']);

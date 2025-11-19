@@ -1,3 +1,4 @@
+
 <?php
 require_once __DIR__ . '/Model.php';
 
@@ -24,7 +25,10 @@ class AiResponse extends Model
         $this->user_id = $data["user_id"];
     }
 
-
+    public function getId(): int
+    {
+        return $this->id;
+    }
 
 
     public function __toString()

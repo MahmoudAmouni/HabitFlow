@@ -20,6 +20,11 @@ class AiMeal extends Model
         $this->created_at = $data["created_at"];
     }
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
 
 
 

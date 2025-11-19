@@ -99,6 +99,8 @@ class UserService
 
             if (empty($data))
                 return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
+            $hashed_password = password_hash($data["password"], PASSWORD_DEFAULT);
+            $data["password"] = $hashed_password;
 
             $result = $user->update($this->connection,  $data, "id");
             if ($result == "Duplicate")

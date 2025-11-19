@@ -25,7 +25,7 @@ class LogService
         }
     }
 
-    public function getLogsByUserId($id, $key): array
+    public function getLogsByOtherId($id, $key): array
     {
         try {
             $data = "";
@@ -132,20 +132,21 @@ class LogService
             if (!$log) {
                 return ['status' => 404, 'data' => ['error' => 'log not found']];
             }
-
+            
             if (empty($data)) {
                 return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
             }
-
+            
             $result = $log->update($this->connection,  $data, "id");
             if ($result) {
                 return ['status' => 200, 'data' => ['message' => 'log updated successfully']];
             }
+            echo $log;
 
             return ['status' => 500, 'data' => ['error' => 'Failed to update log']];
         } catch (Throwable $e) {
             error_log("LogService::updateLog error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error occurred while updating log']];
+            return ['status' => 500, 'data' => ['error' => 'DB error occurred while updating log'. $e->getMessage()]];
         }
     }
 

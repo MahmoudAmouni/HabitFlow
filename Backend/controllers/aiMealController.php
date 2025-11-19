@@ -32,7 +32,8 @@ class AiMealController
 
     public function deleteAiMeal()
     {
-        $id = $id = isset($_GET["id"]) ? $_GET["id"] : null;
+        $input = json_decode(file_get_contents("php://input"), true);
+        $id = $input["id"];
 
         if (!$id) {
             echo ResponseService::response(400, ['error' => 'ID is required']);
@@ -58,9 +59,8 @@ class AiMealController
 
     public function updateAiMeal()
     {
-        $id = $_GET['id'] ?? 0;
         $input = json_decode(file_get_contents("php://input"), true);
-
+         $id= $input["id"] ;
         if (!$id) {
             echo ResponseService::response(400, ['error' => 'ID is required']);
             return;
