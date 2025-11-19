@@ -35,6 +35,9 @@ if (admin) {
         <a href="logs.html?id=${id}" class="sidebar-link">
             📋 Logs
         </a>
+         <a href="updateprofile.html?id=${id}" class="nav-item">
+            📋 Settings
+        </a>
         `;
 }
 
