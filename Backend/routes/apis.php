@@ -14,6 +14,7 @@ $routes = [
 
 
     '/logs' => ['controllers' => 'logController', 'method' => 'getLogs'],
+    '/logs/createLogFromAiResponse' => ['controllers' => 'logController', 'method' => 'createLogFromAiResponse'],
     '/logs/create' => ['controllers' => 'logController', 'method' => 'createLog'],
     '/logs/update' => ['controllers' => 'logController', 'method' => 'updateLog'],
     '/logs/delete' => ['controllers' => 'logController', 'method' => 'deleteLog'],
