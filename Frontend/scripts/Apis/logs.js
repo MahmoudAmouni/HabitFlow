@@ -3,7 +3,7 @@ const params = new URLSearchParams(window.location.search);
 export async function getAllLogs() {
   const params = new URLSearchParams(window.location.search);
   const user = JSON.parse(localStorage.getItem("user") || "null");
-  const id = Number(params.get("user_id")) ? Number(params.get("id")) : user.id;
+  const id = Number(params.get("userId")) ? Number(params.get("userId")) : user.id;
 
   try {
     const res = await fetch("http://localhost/HabitFlow/Backend/logs", {

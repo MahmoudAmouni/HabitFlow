@@ -7,56 +7,63 @@
     <link rel="stylesheet" href="../styles/global.css" />
     <link rel="stylesheet" href="../styles/components/header.css" />
     <link rel="stylesheet" href="../styles/components/sideBar.css" />
+    <link rel="stylesheet" href="../styles/components/toast.css" />
     <link rel="stylesheet" href="../styles/pages/globalpages.css" />
     <link rel="stylesheet" href="../styles/pages/updateprofile.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Update Profile</title>
+    <link rel="icon" href="../assets/images/logo.png" type="image/ico">
+    <title>Habit Flow | Update Profile</title>
 </head>
 
 <body>
     <aside class="sidebar" id="side-bar"></aside>
-    <main class="page-content">
-        <!-- <header class="header" id="header"></header> -->
-        <h2 class="page-title">Update Your Profile</h2>
-        <div class="user-form">
-            <div class="form-row">
-                <label class="form-label">Username</label>
-                <div class="input-wrapper">
-                    <input type="text" id="username" class="form-input" placeholder="Enter your username">
-                    <span id="username-error" class="input-feedback"></span>
-                </div>
-            </div>
+    <main class="main-content">
+        <!-- header -->
+        <header class="header" id="header"></header>
 
-            <div class="form-row">
-                <label class="form-label">Email</label>
-                <div class="input-wrapper">
-                    <input type="email" id="email" class="form-input" placeholder="Enter your email">
-                    <span id="email-error" class="input-feedback"></span>
+        <div class="page-content">
+            <h2 class="page-title">Update Your Profile</h2>
+            <div class="user-form">
+                <div class="form-row">
+                    <label class="form-label">Username</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="username" class="form-input" placeholder="Enter your username">
+                        <span id="username-error" class="input-feedback"></span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-row">
-                <label class="form-label">New Password</label>
-                <div class="input-wrapper">
-                    <input type="password" id="new-password" class="form-input" placeholder="Enter new password">
-                    <span id="password-error" class="input-feedback"></span>
+                <div class="form-row">
+                    <label class="form-label">Email</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" class="form-input" placeholder="Enter your email">
+                        <span id="email-error" class="input-feedback"></span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-row">
-                <label class="form-label">Confirm New Password</label>
-                <div class="input-wrapper">
-                    <input type="password" id="confirm-password" class="form-input" placeholder="Confirm new password">
-                    <span id="confirm-password-error" class="input-feedback"></span>
+                <div class="form-row">
+                    <label class="form-label">New Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="new-password" class="form-input" placeholder="Enter new password">
+                        <span id="password-error" class="input-feedback"></span>
+                    </div>
                 </div>
-            </div>
 
-            <button id="update-user-btn" class="submit-btn">Update Profile</button>
+                <div class="form-row">
+                    <label class="form-label">Confirm New Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirm-password" class="form-input"
+                            placeholder="Confirm new password">
+                        <span id="confirm-password-error" class="input-feedback"></span>
+                    </div>
+                </div>
+
+                <button id="update-user-btn" class="submit-btn">Update Profile</button>
+            </div>
         </div>
     </main>
     <script src="../scripts/components/sideBar.js"></script>
+    <script src="../scripts/components/header.js"></script>
     <script type="module" src="../scripts/pages/updateProfile.js"></script>
-    <script type="module" src="../scripts/Authentication/checkUser.js"></script>
 </body>
 
 </html>

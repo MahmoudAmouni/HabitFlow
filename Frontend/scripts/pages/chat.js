@@ -1,5 +1,5 @@
 import { deleteAiMeal, deleteAiResponse, getAllAiMeals, getAllAiSummarys } from "../Apis/aiResponse.js";
-const image = `https://lh3.googleusercontent.com/p/AF1QipORWkDpWO4eeNTIKVajwa9IkprBH82e44i1b0Ws=w115-h115-n-k-no`;
+import { showToast } from "../components/toast.js";
 let aiSummary;
 let aiMeal;
 
@@ -70,11 +70,10 @@ function createAiResponseElement(item) {
       <div class="ai-card-content">
       
       <p>${item.summary}</p>
-      <img src="${image}" alt="${item.title}" style="max-width: 200px; border-radius: 8px;">
       </div>
       </div>
       <div class="item-actions">
-                <button class="item-btn delete-btn" data-id="${item.id}" data-type="${item.type}">🗑️</button>
+                <button class="item-btn delete-btn" data-id="${item.id}" data-type="${item.type}"><img src="../assets/images/trash.png" width="20" height="20"/></button>
             </div>
       </div>
     `;
@@ -87,7 +86,7 @@ function createAiResponseElement(item) {
         <p><strong>Suggestion:</strong> ${item.suggestion}</p>
       </div>
         <div class="item-actions">
-                <button class="item-btn delete-btn" data-id="${item.id}" data-type="${item.type}">🗑️</button>
+                <button class="item-btn delete-btn" data-id="${item.id}" data-type="${item.type}"><img src="../assets/images/trash.png" width="20" height="20"/></button>
             </div>
       </div>
     `;
@@ -141,6 +140,7 @@ function renderCombinedData() {
 async function handleDelete(id, type) {
   if(confirm('Are you sure ?')) type ==='meal' ? deleteAiMeal(id) : deleteAiResponse(id)
     renderResponsesandMeals();
+  showToast("Deleted Successfully")
 }
 
 document.addEventListener("DOMContentLoaded", () => {

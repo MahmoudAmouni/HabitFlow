@@ -30,6 +30,7 @@
     text-decoration: none;
     font-size: 0.95rem;
     transition: color 0.2s ease;
+    
 }
 
 .header-link:hover {
@@ -111,6 +112,10 @@
     color: var(--text-white);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: background-color 0.2s ease;
+    display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 0.6rem;
 }
 
 .sidebar-link:hover {

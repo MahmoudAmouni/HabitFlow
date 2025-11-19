@@ -163,21 +163,21 @@
 }
 
 .edit-btn {
-    background-color: #61A0FF;
+    background-color: #61a0ff00;
     color: white;
 }
 
 .edit-btn:hover {
-    background-color: #4d8cff;
+    background-color: #4d8bff00;
 }
 
 .delete-btn {
-    background-color: #ff5050;
+    background-color: #ff505000;
     color: white;
 }
 
 .delete-btn:hover {
-    background-color: #e04040;
+    background-color: #e0404000;
 }
 
 @media (max-width: 768px) {
