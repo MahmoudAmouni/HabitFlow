@@ -62,7 +62,7 @@ class LogService
                 return $validationResult;
             }
 
-            $data['logged_at'] = date('Y-m-d');
+            $data['logged_at'] = $data['logged_at']?: date('Y-m-d') ;
 
             $validationResult = $this->validateHabitOwnership($data);
             if (isset($validationResult['status']) && $validationResult['status'] !== 200) {
