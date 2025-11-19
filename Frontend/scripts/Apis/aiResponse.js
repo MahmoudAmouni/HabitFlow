@@ -1,7 +1,6 @@
 const user = JSON.parse(localStorage.getItem("user") || "null");
 
  export async function createAiSummary(type) {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
   try {
     const res = await fetch("http://localhost/HabitFlow/Backend/AiAnalyze", {
       method: "POST",
@@ -52,7 +51,7 @@ export async function handleCreateLogsFromAiResponse(text) {
         text,
       }),
     });
-    const data = await res.json();console.log(data);
+    const data = await res.json();
     return data;
   } catch (error) {
     console.log(error);
