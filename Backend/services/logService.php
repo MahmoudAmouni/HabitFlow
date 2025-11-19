@@ -97,8 +97,12 @@ class LogService
         $results = [];
         $successCount = 0;
         $errorCount = 0;
+        if(!$data['array_data']){
+            return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
+        }
+        
 
-        foreach ($data as $logData) {
+        foreach ($data['array_data'] as $logData) {
             $result = $this->createLog($logData);
             $results[] = $result;
             if (isset($result['status']) && $result['status'] == 201) {
