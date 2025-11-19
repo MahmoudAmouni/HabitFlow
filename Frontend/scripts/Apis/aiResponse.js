@@ -74,7 +74,7 @@ export async function getAllAiSummarys() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // user_id: id,
+        user_id: id,
       }),
     });
     const data = await res.json();
@@ -95,11 +95,54 @@ export async function getAllAiMeals() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // user_id: id,
+        user_id: id,
       }),
     });
     const data = await res.json();
     return data.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+export async function deleteAiMeal(id) {
+  try {
+    const res = await fetch(
+      "http://localhost/HabitFlow/Backend/aiMeals/delete",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+        }),
+      }
+    );
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function deleteAiResponse(id) {
+  try {
+    const res = await fetch(
+      "http://localhost/HabitFlow/Backend/aiResponse/delete",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+        }),
+      }
+    );
+    const data = await res.json();
+    return data;
   } catch (error) {
     console.log(error);
   }
