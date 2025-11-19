@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . "/../models/User.php");
+require_once(__DIR__ . "/serviceHelper.php");
 
 class UserService
 {
@@ -22,14 +23,10 @@ class UserService
             }
 
             $users = User::findAll($this->connection);
-            $data = [];
-            foreach ($users as $user) {
-                $data[] = $user->toArray();
-            }
+            $data = array_map(fn($user) => $user->toArray(), $users);
             return ['status' => 200, 'data' => $data];
         } catch (Exception $e) {
-            error_log("UserService::getUsers error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while fetching users']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting user: ' . $e->getMessage()]];
         }
     }
 
@@ -44,25 +41,19 @@ class UserService
                 return ['status' => 404, 'data' => ['error' => 'user not found']];
             }
         } catch (Exception $e) {
-            error_log("UserService::getUserByEmail error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while fetching user by email']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting user by email: ' . $e->getMessage()]];
         }
     }
 
-    public function createUser(array $data): array
+    public function createUser(array $data)
     {
         try {
-            $requiredFields = ['name', 'email', 'password', 'height', 'weight', 'gender'];
-            foreach ($requiredFields as $field) {
-                if (!isset($data[$field]) || empty(trim($data[$field]))) {
-                    return [
-                        'status' => 400,
-                        'data' => ['error' => "Missing or empty required field: {$field}"]
-                    ];
-                }
+            $validationResult = validateRequiredFields($data, $this->getRequiredFields());
+            if ($validationResult !== true) {
+                return $validationResult;
             }
-            $hashed_password = password_hash($data["password"], PASSWORD_DEFAULT);
-            $data["password"] = $hashed_password;
+
+            $data["password"] = password_hash($data["password"], PASSWORD_DEFAULT);
 
             $userId = User::create($this->connection, $data);
             if ($userId == "Duplicate") {
@@ -85,8 +76,7 @@ class UserService
 
             return ['status' => 500, 'data' => ['error' => 'Failed to create user']];
         } catch (Exception $e) {
-            error_log("UserService::createuser error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while creating user']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while creating user: ' . $e->getMessage()]];
         }
     }
 
@@ -94,25 +84,28 @@ class UserService
     {
         try {
             $user = User::find($this->connection, $id, "id");
-            if (!$user)
+            if (!$user) {
                 return ['status' => 404, 'data' => ['error' => 'user not found']];
+            }
 
-            if (empty($data))
+            if (empty($data)) {
                 return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
-            $hashed_password = password_hash($data["password"], PASSWORD_DEFAULT);
-            $data["password"] = $hashed_password;
+            }
 
-            $result = $user->update($this->connection,  $data, "id");
-            if ($result == "Duplicate")
+            $data["password"] = password_hash($data["password"], PASSWORD_DEFAULT);
+
+            $result = $user->update($this->connection, $data, "id");
+            if ($result == "Duplicate") {
                 return ['status' => 500, 'data' => ['message' => 'Email already in use']];
+            }
 
-            if ($result)
+            if ($result) {
                 return ['status' => 200, 'data' => ['message' => 'user updated successfully']];
+            }
 
             return ['status' => 500, 'data' => ['error' => 'Failed to update user']];
         } catch (Exception $e) {
-            error_log("UserService::updateuser error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while updating user']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while updating user: ' . $e->getMessage()]];
         }
     }
 
@@ -131,9 +124,15 @@ class UserService
 
             return ['status' => 500, 'data' => ['error' => 'Failed to delete user']];
         } catch (Exception $e) {
-            error_log("UserService::deleteuser error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while deleting user']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while deleting user: ' . $e->getMessage()]];
         }
+    }
+
+
+
+    private function getRequiredFields()
+    {
+        return ['name', 'email', 'password', 'height', 'weight', 'gender'];
     }
 }
 ?>

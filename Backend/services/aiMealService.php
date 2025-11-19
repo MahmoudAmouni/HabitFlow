@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . "/../models/AiMeal.php");
 require_once(__DIR__ . "/../models/User.php");
+require_once(__DIR__ . "/serviceHelper.php");
 
 class AiMealService
 {
@@ -15,53 +16,36 @@ class AiMealService
     {
         try {
             $aiMeals = AiMeal::findAll($this->connection);
-            $data = [];
-            foreach ($aiMeals as $aiMeal) {
-                $data[] = $aiMeal->toArray();
-            }
+            $data = array_map(fn($aiMeal) => $aiMeal->toArray(), $aiMeals);
             return ['status' => 200, 'data' => $data];
         } catch (Exception $e) {
-            error_log("aiMealService::getaiMeals error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while fetching aiMeals']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting aiMeals: ' . $e->getMessage()]];
         }
     }
 
     public function getAiMealsByUserId($id, $key): array
     {
         try {
-            $data = "";
-            if ($key == "user_id") {
-                $data = User::find($this->connection, $id, 'id');
-            } else {
-                $data = Habit::find($this->connection, $id, $key);
-            }
-
-            if (!$data) {
-                return ['status' => 404, 'data' => ['error' => 'Wrong id']];
+            $data = validateIdExists($this->connection, $id, $key);
+            if (isset($data['status']) && $data['status'] !== 200) {
+                return $data;
             }
 
             $aiMeals = AiMeal::findAllByOtherId($this->connection, $id, $key);
-            $data = array_map(fn($aiMeals) => $aiMeals->toArray(), $aiMeals);
+            $data = array_map(fn($aiMeal) => $aiMeal->toArray(), $aiMeals);
 
             return ['status' => 200, 'data' => $data];
-        } catch (Throwable $e) {
-            error_log("AiMealService::getLogsByOtherId error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error while fetching user aiMeals']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting aiMeals by user id: ' . $e->getMessage()]];
         }
     }
-
 
     public function createAiMeal(array $data): array
     {
         try {
-            $requiredFields = ['title', 'url', 'summary'];
-            foreach ($requiredFields as $field) {
-                if (!isset($data[$field]) || empty(trim($data[$field]))) {
-                    return [
-                        'status' => 400,
-                        'data' => ['error' => "Missing or empty required field: {$field}"]
-                    ];
-                }
+            $validationResult = validateRequiredFields($data, $this->getRequiredFields());
+            if ($validationResult !== true) {
+                return $validationResult;
             }
 
             $aiMealId = AiMeal::create($this->connection, $data);
@@ -77,8 +61,7 @@ class AiMealService
 
             return ['status' => 500, 'data' => ['error' => 'Failed to create aiMeal']];
         } catch (Exception $e) {
-            error_log("aiMealService::createaiMeal error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while creating aiMeal']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while creating aiMeal: ' . $e->getMessage()]];
         }
     }
 
@@ -86,21 +69,23 @@ class AiMealService
     {
         try {
             $aiMeal = AiMeal::find($this->connection, $id, "id");
-            if (!$aiMeal)
+            if (!$aiMeal) {
                 return ['status' => 404, 'data' => ['error' => 'aiMeal not found']];
+            }
 
-            if (empty($data))
+            if (empty($data)) {
                 return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
+            }
 
             $result = $aiMeal->update($this->connection, $data, "id");
 
-            if ($result)
+            if ($result) {
                 return ['status' => 200, 'data' => ['message' => 'aiMeal updated successfully']];
+            }
 
             return ['status' => 500, 'data' => ['error' => 'Failed to update aiMeal']];
         } catch (Exception $e) {
-            error_log("aiMealService::updateaiMeal error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while updating aiMeal']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while updating aiMeal: ' . $e->getMessage()]];
         }
     }
 
@@ -119,9 +104,15 @@ class AiMealService
 
             return ['status' => 500, 'data' => ['error' => 'Failed to delete aiMeal']];
         } catch (Exception $e) {
-            error_log("aiMealService::deleteaiMeal error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'Database error occurred while deleting aiMeal']];
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while deleting aiMeal: ' . $e->getMessage()]];
         }
+    }
+
+
+
+    private function getRequiredFields()
+    {
+        return ['title', 'url', 'summary'];
     }
 }
 ?>

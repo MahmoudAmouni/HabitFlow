@@ -2,6 +2,7 @@
 require_once(__DIR__ . "/../models/Log.php");
 require_once(__DIR__ . "/../models/User.php");
 require_once(__DIR__ . "/../models/Habit.php");
+require_once(__DIR__ . "/serviceHelper.php");
 
 class LogService
 {
@@ -12,101 +13,68 @@ class LogService
         $this->connection = $connection;
     }
 
-    public function getLogById(int $id): array
+    public function getLogById(int $id)
     {
         try {
             $log = Log::find($this->connection, $id, 'id');
             return $log
                 ? ['status' => 200, 'data' => $log->toArray()]
                 : ['status' => 404, 'data' => ['error' => 'log not found']];
-        } catch (Throwable $e) {
-            error_log("LogService::getLogById error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error while fetching log']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting log by id: ' . $e->getMessage()]];
         }
     }
 
-    public function getLogsByOtherId($id, $key): array
+    public function getLogsByOtherId($id, $key)
     {
         try {
-            $data = "";
-            if ($key == "user_id") {
-                $data = User::find($this->connection, $id, 'id');
-            } else {
-                $data = Habit::find($this->connection, $id, $key);
-            }
-
-            if (!$data) {
-                return ['status' => 404, 'data' => ['error' => 'Wrong id']];
+            $validationResult = validateIdExists($this->connection, $id, $key);
+            if (isset($validationResult['status']) && $validationResult['status'] !== 200) {
+                return $validationResult;
             }
 
             $logs = Log::findAllByOtherId($this->connection, $id, $key);
             $data = array_map(fn($log) => $log->toArray(), $logs);
 
             return ['status' => 200, 'data' => $data];
-        } catch (Throwable $e) {
-            error_log("LogService::getLogsByOtherId error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error while fetching user logs']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting logs by other ids: ' . $e->getMessage()]];
         }
     }
 
-    public function getAllLogs(): array
+    public function getAllLogs()
     {
         try {
             $logs = Log::findAll($this->connection);
             $data = array_map(fn($log) => $log->toArray(), $logs);
 
             return ['status' => 200, 'data' => $data];
-        } catch (Throwable $e) {
-            error_log("LogService::getAllLogs error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error while fetching logs']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while getting all logs: ' . $e->getMessage()]];
         }
     }
 
-    public function createLog(array $data): array
+    public function createLog(array $data)
     {
         try {
-            $requiredFields = ['habit_id', 'value', "user_id"];
-            foreach ($requiredFields as $field) {
-                if (!isset($data[$field]) || empty(trim($data[$field]))) {
-                    return [
-                        'status' => 400,
-                        'data' => ['error' => "Missing or empty required field: {$field}"]
-                    ];
-                }
+            $validationResult = validateRequiredFields($data, $this->getRequiredFields());
+            if ($validationResult !== true) {
+                return $validationResult;
             }
-            $data['logged_at'] =  date('Y-m-d');
 
-            //check if the habit_id belongs to the user before creating the log
-            $habit = Habit::find($this->connection, $data['habit_id'], "id");
-            if (!$habit)
-                return [
-                    'status' => 500,
-                    'data' => ['error' => "no habit found"]
-                ];
-            $habitArr = $habit->toArray();
+            $data['logged_at'] = date('Y-m-d');
 
-            if ($habitArr["user_id"] != $data["user_id"]) {
-                return [
-                    'status' => 500,
-                    'data' => [
-                        'message' => 'No such habit for this user',
-                        "data" => $habitArr
-                    ]
-                ];
+            $validationResult = $this->validateHabitOwnership($data);
+            if (isset($validationResult['status']) && $validationResult['status'] !== 200) {
+                return $validationResult;
             }
 
             $logId = Log::create($this->connection, $data);
 
-            //if Duplicate update the log no need for creating new one
             if ($logId == "Duplicate") {
-                $habit_id = $data['habit_id'];
-                $date = $data['logged_at'];
-                $log = Log::findByHabitIdAndDate($this->connection, $habit_id,$date);
-                $log["value"] += $data["value"];
-                return $this->updateLog($log["id"], $log);
+                return $this->handleDuplicateLog($data);
             }
 
-            //create new log
             if ($logId) {
                 return [
                     'status' => 201,
@@ -118,35 +86,31 @@ class LogService
             }
 
             return ['status' => 500, 'data' => ['error' => 'Failed to create log']];
-        } catch (Throwable $e) {
-            error_log("LogService::createLog error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error occurred while creating log']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while creating a log: ' . $e->getMessage()]];
         }
     }
 
     public function updateLog(int $id, array $data)
     {
-
         try {
             $log = Log::find($this->connection, $id, "id");
             if (!$log) {
                 return ['status' => 404, 'data' => ['error' => 'log not found']];
             }
-            
+
             if (empty($data)) {
                 return ['status' => 400, 'data' => ['error' => 'No data provided for update']];
             }
-            
-            $result = $log->update($this->connection,  $data, "id");
+
+            $result = $log->update($this->connection, $data, "id");
             if ($result) {
                 return ['status' => 200, 'data' => ['message' => 'log updated successfully']];
             }
-            echo $log;
 
             return ['status' => 500, 'data' => ['error' => 'Failed to update log']];
-        } catch (Throwable $e) {
-            error_log("LogService::updateLog error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error occurred while updating log'. $e->getMessage()]];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while updating a log: ' . $e->getMessage()]];
         }
     }
 
@@ -164,10 +128,49 @@ class LogService
             }
 
             return ['status' => 500, 'data' => ['error' => 'Failed to delete log']];
-        } catch (Throwable $e) {
-            error_log("LogService::deleteLog error: " . $e->getMessage());
-            return ['status' => 500, 'data' => ['error' => 'DB error occurred while deleting log']];
+        } catch (Exception $e) {
+            return ['status' => 500, 'data' => ['error' => 'Database error occurred while deleting a log: ' . $e->getMessage()]];
         }
+    }
+
+    
+
+    private function validateHabitOwnership(array $data)
+    {
+        $habit = Habit::find($this->connection, $data['habit_id'], "id");
+        if (!$habit) {
+            return [
+                'status' => 500,
+                'data' => ['error' => "no habit found"]
+            ];
+        }
+
+        $habitArr = $habit->toArray();
+        if ($habitArr["user_id"] != $data["user_id"]) {
+            return [
+                'status' => 500,
+                'data' => [
+                    'message' => 'No such habit for this user',
+                    "data" => $habitArr
+                ]
+            ];
+        }
+
+        return ['status' => 200, 'data' => 'Valid'];
+    }
+
+    private function handleDuplicateLog(array $data)
+    {
+        $habit_id = $data['habit_id'];
+        $date = $data['logged_at'];
+        $log = Log::findByHabitIdAndDate($this->connection, $habit_id, $date);
+        $log["value"] += $data["value"];
+        return $this->updateLog($log["id"], $log);
+    }
+
+    private function getRequiredFields()
+    {
+        return ['habit_id', 'value', "user_id"];
     }
 }
 ?>

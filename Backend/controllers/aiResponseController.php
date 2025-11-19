@@ -17,59 +17,73 @@ class AiResponseController
 
     public function getAiResponses()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
-        if ($input['user_id']) {
-            $user_id = $input['user_id'];
-            $result = $this->aiResponseService->getAiResponsesByUserId($user_id, 'user_id');
-        }else{
-            $result = $this->aiResponseService->getAiResponse();
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
+            if ($input['user_id']) {
+                $user_id = $input['user_id'];
+                $result = $this->aiResponseService->getAiResponsesByUserId($user_id, 'user_id');
+            } else {
+                $result = $this->aiResponseService->getAiResponse();
+            }
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while getting AI responses: ' . $e->getMessage()]);
         }
-        echo ResponseService::response($result['status'], $result['data']);
     }
-
 
     public function deleteAiResponse()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
-        $id = $input["id"];
-        if (!$id) {
-            echo ResponseService::response(400, ['error' => 'ID is required']);
-            return;
-        }
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
+            $id = $input["id"];
+            if (!$id) {
+                echo ResponseService::response(400, ['error' => 'ID is required']);
+                return;
+            }
 
-        $result = $this->aiResponseService->deleteAiResponse($id);
-        echo ResponseService::response($result['status'], $result['data']);
+            $result = $this->aiResponseService->deleteAiResponse($id);
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while deleting the AI response: ' . $e->getMessage()]);
+        }
     }
 
     public function createAiResponse()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
 
-        if (!$input) {
-            echo ResponseService::response(400, ['error' => 'No data provided']);
-            return;
+            if (!$input) {
+                echo ResponseService::response(400, ['error' => 'No data provided']);
+                return;
+            }
+
+            $result = $this->aiResponseService->createAiResponse($input);
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while creating the AI response: ' . $e->getMessage()]);
         }
-
-        $result = $this->aiResponseService->createAiResponse($input);
-        echo ResponseService::response($result['status'], $result['data']);
     }
 
     public function updateAiResponse()
     {
-        
-        $input = json_decode(file_get_contents("php://input"), true);
-        $id = $input["id"];
-        if (!$id) {
-            echo ResponseService::response(400, ['error' => 'ID is required']);
-            return;
-        }
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
+            $id = $input["id"];
+            if (!$id) {
+                echo ResponseService::response(400, ['error' => 'ID is required']);
+                return;
+            }
 
-        if (!$input) {
-            echo ResponseService::response(400, ['error' => 'provide data to update']);
-            return;
+            if (!$input) {
+                echo ResponseService::response(400, ['error' => 'provide data to update']);
+                return;
+            }
+            $result = $this->aiResponseService->updateAiResponse($id, $input);
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while updating the AI response: ' . $e->getMessage()]);
         }
-        $result = $this->aiResponseService->updateAiResponse($id, $input);
-        echo ResponseService::response($result['status'], $result['data']);
     }
 }
 ?>

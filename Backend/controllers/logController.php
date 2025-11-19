@@ -17,73 +17,88 @@ class LogController
 
     public function getLogs()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
-        $id = $input["id"]?? null;
-        if($id){
-            $result = $this->logService->getLogById($id);
-            echo ResponseService::response($result['status'], $result['data']);
-            exit;
-        }
-        $user_id = $input["user_id"] ?? null;
-        $habit_id = $input["habit_id"] ?? null;
-        if ($user_id) {
-            $result = $this->logService->getLogsByOtherId($user_id,"user_id");
-            echo ResponseService::response($result['status'], $result['data']);
-            exit;
-        }
-        if ($habit_id) {
-            $result = $this->logService->getLogsByOtherId($habit_id, "habit_id");
-            echo ResponseService::response($result['status'], $result['data']);
-            exit;
-        }
-        
-        $result = $this->logService->getAllLogs();
-        echo ResponseService::response($result['status'], $result['data']);
-    }
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
+            $id = $input["id"] ?? null;
+            if ($id) {
+                $result = $this->logService->getLogById($id);
+                echo ResponseService::response($result['status'], $result['data']);
+                exit;
+            }
+            $user_id = $input["user_id"] ?? null;
+            $habit_id = $input["habit_id"] ?? null;
+            if ($user_id) {
+                $result = $this->logService->getLogsByOtherId($user_id, "user_id");
+                echo ResponseService::response($result['status'], $result['data']);
+                exit;
+            }
+            if ($habit_id) {
+                $result = $this->logService->getLogsByOtherId($habit_id, "habit_id");
+                echo ResponseService::response($result['status'], $result['data']);
+                exit;
+            }
 
+            $result = $this->logService->getAllLogs();
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while retrieving logs: ' . $e->getMessage()]);
+        }
+    }
 
     public function deleteLog()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
-        $id =$input["id"];
-        if (!$id) {
-            echo ResponseService::response(400, ['error' => 'ID is required']);
-            return;
-        }
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
+            $id = $input["id"];
+            if (!$id) {
+                echo ResponseService::response(400, ['error' => 'ID is required']);
+                return;
+            }
 
-        $result = $this->logService->deleteLog($id);
-        echo ResponseService::response($result['status'], $result['data']);
+            $result = $this->logService->deleteLog($id);
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while deleting the log: ' . $e->getMessage()]);
+        }
     }
 
     public function createLog()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
 
-        if (!$input) {
-            echo ResponseService::response(400, ['error' => 'No data provided']);
-            return;
+            if (!$input) {
+                echo ResponseService::response(400, ['error' => 'No data provided']);
+                return;
+            }
+
+            $result = $this->logService->createLog($input);
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while creating the log: ' . $e->getMessage()]);
         }
-
-        $result = $this->logService->createLog($input);
-        echo ResponseService::response($result['status'], $result['data']);
     }
 
     public function updateLog()
     {
-        $input = json_decode(file_get_contents("php://input"), true);
-        $id = $input["id"];
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
+            $id = $input["id"];
 
-        if (!$id) {
-            echo ResponseService::response(400, ['error' => 'ID is required']);
-            return;
-        }
-        if (!$input) {
-            echo ResponseService::response(400, ['error' => 'provide data to update']);
-            return;
-        }
+            if (!$id) {
+                echo ResponseService::response(400, ['error' => 'ID is required']);
+                return;
+            }
+            if (!$input) {
+                echo ResponseService::response(400, ['error' => 'provide data to update']);
+                return;
+            }
 
-        $result = $this->logService->updateLog($id, $input);
-        echo ResponseService::response($result['status'], $result['data']);
+            $result = $this->logService->updateLog($id, $input);
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while updating the log: ' . $e->getMessage()]);
+        }
     }
 }
 ?>
