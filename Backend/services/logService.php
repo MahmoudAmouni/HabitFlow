@@ -62,7 +62,8 @@ class LogService
                 return $validationResult;
             }
 
-            $data['logged_at'] = $data['logged_at']?: date('Y-m-d') ;
+            $date = $data['logged_at']?? date('Y-m-d') ;
+            $data['logged_at'] = $date;
 
             $validationResult = $this->validateHabitOwnership($data);
             if (isset($validationResult['status']) && $validationResult['status'] !== 200) {
@@ -89,6 +90,38 @@ class LogService
         } catch (Exception $e) {
             return ['status' => 500, 'data' => ['error' => 'Database error occurred while creating a log: ' . $e->getMessage()]];
         }
+    }
+
+    public function createLogFromAiResponse(array $data)
+    {
+        $results = [];
+        $successCount = 0;
+        $errorCount = 0;
+
+        foreach ($data as $logData) {
+            $result = $this->createLog($logData);
+            $results[] = $result;
+            if (isset($result['status']) && $result['status'] == 201) {
+                $successCount++;
+            } else {
+                $errorCount++;
+            }
+        }
+
+        return [
+            'status' => $errorCount === 0 ? 201 : ($successCount > 0 ? 207 : 500), 
+            'data' => [
+                'message' => $errorCount === 0
+                    ? 'All logs created successfully'
+                    : ($successCount > 0
+                        ? 'Some logs created successfully'
+                        : 'Failed to create any logs'),
+                'total_processed' => count($data),
+                'successful' => $successCount,
+                'failed' => $errorCount,
+                'results' => $results
+            ]
+        ];
     }
 
     public function updateLog(int $id, array $data)

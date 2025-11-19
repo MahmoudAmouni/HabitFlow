@@ -79,6 +79,23 @@ class LogController
         }
     }
 
+    public function createLogFromAiResponse()
+    {
+        try {
+            $input = json_decode(file_get_contents("php://input"), true);
+
+            if (!$input) {
+                echo ResponseService::response(400, ['error' => 'No data provided']);
+                return;
+            }
+
+            $result = $this->logService->createLogFromAiResponse($input);
+            echo ResponseService::response($result['status'], $result['data']);
+        } catch (Exception $e) {
+            echo ResponseService::response(500, ['error' => 'An error occurred while creating the log: ' . $e->getMessage()]);
+        }
+    }
+
     public function updateLog()
     {
         try {
