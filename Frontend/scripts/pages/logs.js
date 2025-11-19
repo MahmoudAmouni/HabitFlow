@@ -1,10 +1,12 @@
 import { getAllHabits } from "../Apis/habits.js";
-import { getAllLogs, deleteLog, createLog } from "../Apis/logs.js";
+import { getAllLogs, deleteLog, createLog, editLog } from "../Apis/logs.js";
 const params = new URLSearchParams(window.location.search);
-let habitsData = []; 
+let habitsData = [];
+
+const dateSelect = document.getElementById("date-select");
+
 if (params.get("userId")) {
   const habitSelect = document.getElementById("habit-select");
-  const dateSelect = document.getElementById("date-select");
   const logSInput = document.getElementById("log-input");
   habitSelect.disabled = true;
   dateSelect.disabled = true;
@@ -22,9 +24,11 @@ async function renderLogs() {
     getAllLogs(),
     getAllHabits(),
   ]);
+  logsData.sort((a, b) => {
+    return new Date(b.logged_at) - new Date(a.logged_at);
+  });
 
-  habitsData = fetchedHabitsData; 
-  
+  habitsData = fetchedHabitsData;
 
   const habitSelect = document.getElementById("habit-select");
   habitSelect.innerHTML = "";
@@ -36,15 +40,28 @@ async function renderLogs() {
     habitSelect.appendChild(option);
   });
 
-  // dates.map((date) => {
-  //   const option = document.createElement("option");
-  //   option.value = date;
-  //   option.textContent = new Date(date).toLocaleDateString();
-  //   dateSelect.appendChild(option);
-  // });
+  dateSelect.innerHTML = "";
 
-  console.log(logsData);
-  console.log(habitsData);
+  const dates = [];
+  const today = new Date();
+
+  for (let i = 0; i <= 3; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    dates.push(date.toISOString().split("T")[0]);
+  }
+
+  dates.map((date) => {
+    const option = document.createElement("option");
+    option.value = date;
+    const dateObj = new Date(date);
+    option.textContent = dateObj.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    dateSelect.appendChild(option);
+  });
 
   logsData.map((log) => {
     const habit = habitsData.find((habit) => habit.id == log.habit_id);
@@ -56,32 +73,45 @@ async function renderLogs() {
     logItem.innerHTML = `
             <div class="log-text">${log.value}-${habitUnit} <span style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">(${habitName} • ${log.logged_at})</span></div>
             <div class="log-actions">
+            <button class="log-btn edit-btn" data-id="${log.id}">✏️</button> 
                 <button class="log-btn delete-btn" data-id="${log.id}">🗑️</button>
             </div>
         `;
     logsContainer.appendChild(logItem);
-    
-    
   });
 
-    document.querySelectorAll(".delete-btn").forEach((button)=>{
-        button.addEventListener('click',handleDeleteLog)
-        if (params.get("userId")) {
-          button.disabled = true;
-          button.style.cursor = "not-allowed";
-        }
-    })
-    
-  };
-
-
-async function handleDeleteLog(e){
-    const LogId = e.target.dataset.id;
-    if(confirm("Are you sure you want to delete ?")){
-        await deleteLog(LogId)
-        renderLogs()
+  document.querySelectorAll(".delete-btn").forEach((button) => {
+    button.addEventListener("click", handleDeleteLog);
+    if (params.get("userId")) {
+      button.disabled = true;
+      button.style.cursor = "not-allowed";
     }
+  });
+
+  document.querySelectorAll(".edit-btn").forEach((button) => {
+    button.addEventListener("click", handleEditLog);
+    if (params.get("userId")) {
+      button.disabled = true;
+      button.style.cursor = "not-allowed";
+    }
+  });
 }
+
+async function handleDeleteLog(e) {
+  const LogId = e.target.dataset.id;
+  if (confirm("Are you sure you want to delete ?")) {
+    await deleteLog(LogId);
+    renderLogs();
+  }
+}
+
+async function handleEditLog(e) {
+  const LogId = e.target.dataset.id;
+   let value =prompt("Write new value")
+    await editLog(LogId,value);
+    renderLogs();
+  }
+
 
 function updateUnitBox() {
   const habitSelect = document.getElementById("habit-select");
@@ -94,7 +124,6 @@ function updateUnitBox() {
     const selectedHabit = habitsData.find(
       (habit) => habit.name === selectedHabitName
     );
-    console.log(selectedHabit)
     unitBox.textContent = selectedHabit ? selectedHabit.unit : "";
   } else {
     unitBox.textContent = "";
@@ -110,14 +139,14 @@ document
   .addEventListener("click", async function () {
     const habitSelect = document.getElementById("habit-select");
     const selectedHabitId = parseInt(habitSelect.value);
-    // const date = document.getElementById("date-select").value;
+    const date = document.getElementById("date-select").value;
     const value = document.getElementById("log-input").value.trim();
-    
-    if (!value) {
-        alert("Please enter a log entry");
-        return;
+
+    if (!value || isNaN(value)) {
+      alert("Please enter a valid log entry");
+      return;
     }
-    await createLog(value,selectedHabitId)
+    await createLog(value, selectedHabitId,date);
 
     document.getElementById("log-input").value = "";
     await renderLogs();

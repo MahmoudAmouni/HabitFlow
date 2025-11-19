@@ -62,7 +62,26 @@ export async function deleteLog(id) {
   }
 }
 
-export async function createLog(value, habit_id) {
+export async function editLog(id,value) {
+  try {
+    const res = await fetch("http://localhost/HabitFlow/Backend/logs/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id,
+        value
+      }),
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function createLog(value, habit_id,date) {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   try {
     const res = await fetch("http://localhost/HabitFlow/Backend/logs/create", {
@@ -74,6 +93,7 @@ export async function createLog(value, habit_id) {
         habit_id,
         user_id: user.id,
         value,
+        logged_at:date
       }),
     });
     const data = await res.json();
