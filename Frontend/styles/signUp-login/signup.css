@@ -27,7 +27,7 @@
     justify-content: center;
 }
 
-.signup-logo .logo img{
+.signup-logo .logo img {
     width: 60px;
     height: 45px;
 }
@@ -76,6 +76,14 @@
     outline: none;
     border-color: var(--accent-blue);
     box-shadow: 0 0 0 2px rgba(97, 160, 255, 0.1);
+}
+
+.input-error {
+    display: block;
+    color: #ff5050;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    padding-left: 0.25rem;
 }
 
 .form-row {

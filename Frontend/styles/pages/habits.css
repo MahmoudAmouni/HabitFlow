@@ -68,21 +68,21 @@
 }
 
 .edit-btn {
-    background-color: #61A0FF;
+    background-color: #61a0ff00;
     color: white;
 }
 
 .edit-btn:hover {
-    background-color: #4d8cff;
+    background-color: #4d8bff00;
 }
 
 .delete-btn {
-    background-color: #ff5050;
+    background-color: #ff505000;
     color: white;
 }
 
 .delete-btn:hover {
-    background-color: #e04040;
+    background-color: #e0404000;
 }
 
 .modal-overlay {
@@ -109,7 +109,6 @@
     padding: 2.5rem;
     width: 90%;
     max-width: 500px;
-    text-align: center;
     position: relative;
     animation: modal-appear 0.3s ease-out;
 }
@@ -131,6 +130,7 @@
     font-weight: 600;
     margin-bottom: 0.5rem;
     color: var(--text-white);
+    text-align: center;
 }
 
 .modal-form {
@@ -144,11 +144,13 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    align-items: flex-start;
 }
 
 .form-label {
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.7);
+    text-align: left;
 }
 
 .form-input {
@@ -177,4 +179,14 @@
 .modal-buttons .btn {
     flex: 1;
     max-width: 200px;
+}
+
+.empty-habits {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    text-align: center;
 }

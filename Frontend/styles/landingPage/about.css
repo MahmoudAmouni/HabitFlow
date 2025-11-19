@@ -15,12 +15,25 @@
 }
 
 .about-card {
+
+    border-radius: 1rem;
+    padding: 2rem;
+    max-height: 600px;
+    max-width: 1000px;
+    z-index: 100;
+    display: flex;
+    gap: 2rem;
+}
+
+.about-content {
+    flex: 1;
     background-color: var(--card-bg);
     border-radius: 1rem;
     padding: 2rem;
     max-height: 600px;
     max-width: 1000px;
     z-index: 100;
+    gap: 2rem;
 }
 
 .about-card h3 {
@@ -50,6 +63,7 @@
 
     .about-card {
         padding: 1.5rem;
+        flex-direction: column;
     }
 
     .about-card h3 {

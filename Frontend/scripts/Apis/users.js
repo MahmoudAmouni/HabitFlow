@@ -60,7 +60,7 @@ export async function getUserByEmail(email, password) {
       }
     );
     const data = await res.json();
-    return data.data;
+    return data;
   } catch (error) {
     console.log(error);
   }

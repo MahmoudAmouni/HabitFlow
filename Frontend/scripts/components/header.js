@@ -2,51 +2,68 @@
 const params = new URLSearchParams(window.location.search);
 const id = Number(params.get("id"));
 const admin = params.get("admin");
+const userId = params.get("userId");
 const user = JSON.parse(localStorage.getItem("user") || "null");
+
+let navlinks;
 
 if (admin) {
   navlinks = `
-        <a href="home.html?id=${id}" class="sidebar-link">
-            🤖 Ai Insights
+        <a href="home.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="sidebar-link">
+            <img src="../assets/images/bot.png" width="20" height="20"/> Ai Insights
         </a>
-        <a href="progress.html?id=${id}" class="sidebar-link">
-            📈 Progress
+        <a href="progress.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="sidebar-link">
+            <img src="../assets/images/progress.png" width="20" height="20"/> Progress
         </a>
-        <a href="habits.html?id=${id}" class="sidebar-link">
-            🔄 Habits
+        <a href="habits.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="sidebar-link">
+            <img src="../assets/images/repeat.png" width="20" height="20"/> Habits
         </a>
-        <a href="logs.html?id=${id}" class="sidebar-link">
-            📋 Logs
+        <a href="logs.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="sidebar-link">
+            <img src="../assets/images/paper.png" width="20" height="20"/> Logs
         </a>
-        <a href="users.html?id=${id}" class="sidebar-link">
+        <a href="users.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="sidebar-link">
             👥 Users 
         </a>
         `;
 } else {
   navlinks = `
-        <a href="home.html?id=${id}" class="sidebar-link">
-            🤖 Ai Insights
+        <a href="home.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="sidebar-link">
+            <img src="../assets/images/bot.png" width="20" height="20"/> Ai Insights
         </a>
-        <a href="progress.html?id=${id}" class="sidebar-link">
-            📈 Progress
+        <a href="progress.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="sidebar-link">
+            <img src="../assets/images/progress.png" width="20" height="20"/> Progress
         </a>
-        <a href="habits.html?id=${id}" class="sidebar-link">
-            🔄 Habits
+        <a href="habits.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="sidebar-link">
+            <img src="../assets/images/repeat.png" width="20" height="20"/> Habits
         </a>
-        <a href="logs.html?id=${id}" class="sidebar-link">
-            📋 Logs
+        <a href="logs.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="sidebar-link">
+            <img src="../assets/images/paper.png" width="20" height="20"/> Logs
         </a>
-         <a href="updateprofile.html?id=${id}" class="nav-item">
-            📋 Settings
+         <a href="updateprofile.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="sidebar-link">
+            <img src="../assets/images/settings.png" width="20" height="20"/> Settings
         </a>
         `;
 }
-
-
-
-
-
-
 
 function initializeHeader() {
   const header = document.getElementById("header");
@@ -62,7 +79,9 @@ function initializeHeader() {
 function headerSimple() {
   const header = document.getElementById("header");
   header.innerHTML = `
-  <div><a href="updateprofile.html?id=${id}" class="header-title">Welcome Back ${user.name.toUpperCase()} ! </a></div>
+  <div><a href="updateprofile.html?id=${id}${
+    userId ? "&userId=" + userId : ""
+  }" class="header-title">Welcome Back ${user.name.toUpperCase()} ! </a></div>
     <button class="logout-btn" id="logout-btn">Log Out</button>
   `;
 }

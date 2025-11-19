@@ -1,5 +1,6 @@
 import { getAllHabits } from "../Apis/habits.js";
 import { getAllLogs, deleteLog, createLog, editLog } from "../Apis/logs.js";
+import { showToast } from "../components/toast.js";
 const params = new URLSearchParams(window.location.search);
 let habitsData = [];
 
@@ -73,8 +74,8 @@ async function renderLogs() {
     logItem.innerHTML = `
             <div class="log-text">${log.value}-${habitUnit} <span style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">(${habitName} • ${log.logged_at})</span></div>
             <div class="log-actions">
-            <button class="log-btn edit-btn" data-id="${log.id}">✏️</button> 
-                <button class="log-btn delete-btn" data-id="${log.id}">🗑️</button>
+            <button class="log-btn edit-btn" data-id="${log.id}"><img src="../assets/images/edit.png" width="20" height="20"/></button> 
+                <button class="log-btn delete-btn" data-id="${log.id}"><img src="../assets/images/trash.png" width="20" height="20"/></button>
             </div>
         `;
     logsContainer.appendChild(logItem);
@@ -102,6 +103,7 @@ async function handleDeleteLog(e) {
   if (confirm("Are you sure you want to delete ?")) {
     await deleteLog(LogId);
     renderLogs();
+    showToast("Log deleted successfully");
   }
 }
 
@@ -110,6 +112,7 @@ async function handleEditLog(e) {
    let value =prompt("Write new value")
     await editLog(LogId,value);
     renderLogs();
+    showToast("Log updated successfully");
   }
 
 
@@ -150,6 +153,7 @@ document
 
     document.getElementById("log-input").value = "";
     await renderLogs();
+    showToast("Log created successfully");
   });
 
 window.addEventListener("DOMContentLoaded", async function () {

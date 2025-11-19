@@ -51,6 +51,11 @@ document
     if(res.status ===500){
         document.getElementById("email-error").textContent =
           "Email already taken"
+    }else{
+      const user = await getUserById();
+      localStorage.removeItem("user");
+      localStorage.setItem("user", JSON.stringify(user));
+
     }
   });
 
