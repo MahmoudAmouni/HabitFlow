@@ -114,7 +114,6 @@
     animation: modal-appear 0.3s ease-out;
 }
 
-/* animation for the model so it would appear smoothly */
 @keyframes modal-appear {
     from {
         opacity: 0;

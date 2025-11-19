@@ -2,6 +2,7 @@
 const params = new URLSearchParams(window.location.search);
 const id = Number(params.get("id"));
 const admin = params.get("admin");
+const user = JSON.parse(localStorage.getItem("user") || "null");
 
 if (admin) {
   navlinks = `
@@ -35,6 +36,9 @@ if (admin) {
         <a href="logs.html?id=${id}" class="sidebar-link">
             📋 Logs
         </a>
+         <a href="updateprofile.html?id=${id}" class="nav-item">
+            📋 Settings
+        </a>
         `;
 }
 
@@ -58,7 +62,7 @@ function initializeHeader() {
 function headerSimple() {
   const header = document.getElementById("header");
   header.innerHTML = `
-  <div></div>
+  <div><a href="updateprofile.html?id=${id}" class="header-title">Welcome Back ${user.name.toUpperCase()} ! </a></div>
     <button class="logout-btn" id="logout-btn">Log Out</button>
   `;
 }

@@ -1,7 +1,7 @@
 const params = new URLSearchParams(window.location.search);
+const user = JSON.parse(localStorage.getItem("user") || "null");
 
 export async function createHabit(name, unit, target) {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
   try {
     const res = await fetch(
       "http://localhost/HabitFlow/Backend/habits/create",
@@ -26,7 +26,6 @@ export async function createHabit(name, unit, target) {
 }
 
 export async function getAllHabits() {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
   const id = params.get("userId") ? Number(params.get("userId")) : user.id;
 
   try {

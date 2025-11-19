@@ -40,6 +40,9 @@ if (admin) {
         <a href="logs.html?id=${id}" class="nav-item">
             📋 Logs
         </a>
+        <a href="updateprofile.html?id=${id}" class="nav-item">
+            📋 Settings
+        </a>
         `;
 }
 
